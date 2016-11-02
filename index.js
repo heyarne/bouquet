@@ -8,11 +8,9 @@ const app = express()
 const logger = require('morgan')
 app.use(logger('combined'))
 
-const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const session = require('express-session')
 
-app.use(cookieParser())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
   extended: true // parse with `qs`, thus enabling stuff like arrays

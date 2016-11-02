@@ -19,8 +19,8 @@ app.use(bodyParser.urlencoded({
 }))
 app.use(session({
   secret: process.env.SESSION_SECRET,
-  saveUnitialized: false, // save session when it's not initialized
-  resave: false           // save the session back even when it's unmodified (check if store implements `touch`)
+  saveUninitialized: false, // save session when it's not initialized
+  resave: false             // save the session back even when it's unmodified (check if store implements `touch`)
 }))
 
 // authentication and authorization via passwordless
@@ -28,7 +28,12 @@ const passwordless = require('passwordless')
 const auth = require('./middleware/auth')
 
 app.use(passwordless.sessionSupport())
-app.get('/auth', auth)
+app.use('/auth', auth)
+
+// serve everything as a vuejs client-side app
+// TODO: Exclude `public/node_modules`
+const serveStatic = require('serve-static')
+app.get('*', serveStatic(__dirname + '/public'))
 
 module.exports = app
 

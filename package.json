@@ -16,8 +16,10 @@
     "dotenv": "^2.0.0",
     "emailjs": "^1.0.8",
     "express": "^4.14.0",
+    "express-nunjucks": "^2.0.1",
     "express-session": "^1.14.2",
     "morgan": "^1.7.0",
+    "nunjucks": "^2.5.2",
     "passwordless": "^1.1.2",
     "passwordless-mongostore": "^0.1.4"
   },

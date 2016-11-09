@@ -192,4 +192,9 @@ router.post('/verify', (req, res, next) => {
     .catch(err => next(err))
 })
 
+router.post('/logout', (req, res) => {
+  req.session.destroy()
+  res.redirect('/')
+})
+
 module.exports = router

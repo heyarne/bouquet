@@ -19,11 +19,16 @@
     "express": "^4.14.0",
     "express-nunjucks": "^2.0.1",
     "express-session": "^1.14.2",
+    "jsonwebtoken": "^7.1.9",
+    "jwk-to-pem": "^1.2.5",
     "mongoose": "^4.6.5",
     "morgan": "^1.7.0",
+    "node-fetch": "^1.6.3",
     "nunjucks": "^2.5.2",
     "passwordless": "^1.1.2",
-    "passwordless-mongostore": "^0.1.4"
+    "passwordless-mongostore": "^0.1.4",
+    "redis": "^2.6.3",
+    "uuid": "^2.0.3"
   },
   "devDependencies": {
     "debug": "^2.2.0",

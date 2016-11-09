@@ -33,36 +33,7 @@ app.use(session({
 }))
 
 // authentication and authorization via passwordless
-const passwordless = require('passwordless')
-const TokenStore = require('passwordless-mongostore')
 const auth = require('./middleware/auth')
-
-// used for sending the tokens
-const email = require('emailjs')
-const smtp = email.server.connect({
-  user: process.env.SMTP_USER,
-  password: process.env.SMTP_PASSWORD,
-  host: process.env.SMTP_HOST,
-  ssl: !!process.env.SMTP_ENABLE_SSL
-})
-
-passwordless.init(new TokenStore(process.env.MONGODB_URI))
-passwordless.addDelivery((token, uid, recipient, done) => {
-  debug('Sending token', { token, uid, recipient })
-  smtp.send({
-    from: 'bouquet <noreply@localhost>',
-    to: recipient,
-    subject: 'Sign in to bouquet',
-    text: `Hello!
-
-You can access your bouquet account with the following link:
-${process.env.BASE_URL}/auth/login?token=${token}&uid=${encodeURIComponent(uid)}`
-  }, err => err
-    ? console.error('Error when sending mail', err)
-    : done()) //  TODO: This callback looks weird. Check https://github.com/florianheinemann/passwordless again
-})
-
-app.use(passwordless.sessionSupport())
 app.use('/auth', auth)
 
 // serve everything as a vuejs client-side app

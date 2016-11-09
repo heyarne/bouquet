@@ -1,9 +1,6 @@
 <template>
   <div id="app">
-    <form action="/auth/login" method="post" v-if="!user">
-      <input type="email" name="user" value="" placeholder="E-Mail Adresse" />
-      <input type="submit" value="Sign in">
-    </form>
+    <hello />
   </div>
 </template>
 

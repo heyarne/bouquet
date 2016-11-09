@@ -1,7 +1,7 @@
 // load environment variables defined in .env
 require('dotenv').load()
 
-const debug = require('debug')('bouquet:index')
+const debug = require('debug')('bouquet:index') // eslint-disable-line
 
 // set up database
 const mongoose = require('mongoose')
@@ -37,9 +37,6 @@ app.use(session({
 const user = require('./middleware/user')
 app.use(user())
 
-// our index
-app.get('/', (req, res) => res.render('index'))
-
 // authentication and authorization via portier
 const auth = require('./middleware/auth')
 app.use('/auth', auth)
@@ -51,6 +48,10 @@ app.engine('hbs', hbs.express4({
 }))
 app.set('view engine', 'hbs')
 app.set('views', __dirname + '/public')
+
+// set up the few routes where we actually render html on the server side
+app.get('/', (req, res) => res.render('landingpage', { user: req.user }))
+app.get('/app', (req, res) => req.user ? res.render('app') : res.redirect('/')) // TODO: Take care of /app/*
 
 // serve our js and css resources
 const serveStatic = require('serve-static')

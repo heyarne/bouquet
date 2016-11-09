@@ -1,0 +1,15 @@
+{{#if user}}
+    <h1>Welcome {{user.email}}!</h1>
+    <p>
+        Are you looking for your dashboard? Click <a href="/app">here</a>!
+    </p>
+{{else}}
+    <h1>Hey, welcome to bouqet. Want to give it a try? Login!</h1>
+    <p>
+        Please enter your e-mail address. We will send you an e-mail and you can get started.
+    </p>
+    <form action="/auth/login" method="post">
+        <input type="text" name="email" value="" placeholder="Your e-mail adress">
+        <input type="submit" value="Login">
+    </form>
+{{/if}}

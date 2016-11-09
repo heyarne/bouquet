@@ -32,7 +32,7 @@ app.use(session({
   })
 }))
 
-// authentication and authorization via passwordless
+// authentication and authorization via portier
 const auth = require('./middleware/auth')
 app.use('/auth', auth)
 

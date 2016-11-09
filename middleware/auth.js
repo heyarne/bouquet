@@ -5,8 +5,8 @@
  * https://github.com/portier/demo-rp/tree/894501d93b5ff9effaf837e18456816d675e2aee
  */
 const querystring = require('querystring')
-const jwkToPem = require('jwk-to-pem')
 const jwt = require('jsonwebtoken')
+const jkwToPem = require('jwk-to-pem')
 const fetch = require('node-fetch')
 const uuid = require('uuid')
 const redis = require('redis').createClient()
@@ -19,15 +19,15 @@ const router = Router()
 
 /**
  * Converts an object holding JSON Webkeys to an object in the form
- * Key ID -> Key
+ * Key ID -> Key, where key must be RS256
  * @param  {Object} jwks
  * @return {Object}
  */
-function mapKeyIdsToPem (jwks) {
+function mapKeyIdsToPem ({ keys }) {
   const val = {}
-  jwks.keys
-    .map(key => ({ id: key['kid'], pem: jwkToPem(key) }))
-    .forEach(key => val[key.id] = key.pem)
+  keys
+    .filter(key => key.alg === 'RS256')
+    .forEach(key => val[key.kid] = jkwToPem(key))
   return val
 }
 
@@ -123,7 +123,7 @@ function discoverKeys (broker) {
  *
  * .. _PyJWT: https://github.com/jpadilla/pyjwt
  *
- * @param   {String}  The JWT issued by Portier
+ * @param   {String}  token  The JWT issued by Portier
  * @return  {Promise}
  */
 function getVerifiedEmail (token) {
@@ -140,7 +140,7 @@ function getVerifiedEmail (token) {
         issuer: process.env.PORTIER_BROKER_URL
       }
       return new Promise((resolve, reject) =>
-        jwt.verify(token, verifyOpts, (err, decoded) => err ? reject(err) : resolve(decoded))
+        jwt.verify(token, pubKey, verifyOpts, (err, { email }) => err ? reject(err) : resolve(email))
       )
     })
 }
@@ -182,8 +182,14 @@ router.post('/verify', (req, res) => {
   // if not, check the JWT
   const jwt = req.body.id_token
   getVerifiedEmail(jwt)
-    .then(contents => debug('Verified token! Contents:', contents))
-    .catch(err => res.status(400).json({ error: `${err.name}: ${err.message}` }))
+    .then(email => User.findOrCreate({ email }))
+    .then(user => {
+      req.session.email = user.email
+      res.redirect('/')
+    })
+    .catch(err => res.status(400).json({
+      error: { [err.name]: err.message }
+    }))
 })
 
 module.exports = router

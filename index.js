@@ -15,6 +15,7 @@ const app = express()
 const logger = require('morgan')
 app.use(logger(app.get('environment') === 'production' ? 'combined' : 'dev'))
 
+// parse request bodies (json- and url-encoded) and add session support
 const bodyParser = require('body-parser')
 const session = require('express-session')
 const SessionStore = require('connect-mongo')(session)
@@ -37,18 +38,23 @@ const user = require('./middleware/user')
 app.use(user())
 
 // our index
-app.get('/', (req, res) => res.json({
-  message: req.user ? req.user : 'You are not logged in'
-}))
+app.get('/', (req, res) => res.render('index'))
 
 // authentication and authorization via portier
 const auth = require('./middleware/auth')
 app.use('/auth', auth)
 
-// serve everything as a vuejs client-side app
-// TODO: Exclude `public/node_modules`
+// add our template engine, use `.hbs` for extensions and find partials in `public/partials`
+const hbs = require('express-hbs')
+app.engine('hbs', hbs.express4({
+  defaultLayout: __dirname + '/public/__layout.hbs'
+}))
+app.set('view engine', 'hbs')
+app.set('views', __dirname + '/public')
+
+// serve our js and css resources
 const serveStatic = require('serve-static')
-app.get('*', serveStatic(__dirname + '/public'))
+app.use('/dist', serveStatic(__dirname + '/public/dist'))
 
 module.exports = app
 

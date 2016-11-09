@@ -32,6 +32,15 @@ app.use(session({
   })
 }))
 
+// expose current account as `req.user` if a session is established
+const user = require('./middleware/user')
+app.use(user())
+
+// our index
+app.get('/', (req, res) => res.json({
+  message: req.user ? req.user : 'You are not logged in'
+}))
+
 // authentication and authorization via portier
 const auth = require('./middleware/auth')
 app.use('/auth', auth)

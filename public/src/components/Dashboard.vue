@@ -1,19 +1,18 @@
 <template lang="html">
-  <div class="dashboard">
-    <div class="loading" v-if="loading">
-      Loading...
+  <div class="dashboard content">
+    <div class="message loading" v-if="loading">
+      <div class="message-header">Loading...</div>
     </div>
 
-    <div class="error" v-if="error">
-      {{ error.message }}
-    </div>
+    <article class="message is-warning" v-if="error">
+      <div class="message-body">{{ error.message }}</div>
+    </article>
 
     <div class="user" v-if="user">
-      Hello {{ user.email }}!
-    </div>
-
-    <div class="create-trip" v-if="!(user && user.trips.length)">
-      It seems like you don't have created any trips yet. Do you want to <router-link to="/trip/new">create a new one?</router-link>
+      <div>Hello {{ user.email }}!</div>
+      <div v-if="!user.trips.length">
+        It seems like you don't have created any trips yet. Do you want to <router-link to="/trip/new">create a new one?</router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -37,7 +36,6 @@ export default {
       .then(res => res.json())
       .then(res => {
         this.loading = false
-        console.log(res)
         this.user = res.user
       })
       .catch(res => {

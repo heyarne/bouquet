@@ -1,19 +1,15 @@
 <template>
   <div id="app">
-    <hello />
+    <ul class="navbar">
+      <li><router-link to="/">Dashboard</router-link></li>
+      <li><router-link to="/test">Test</router-link></li>
+    </ul>
+    <router-view />
   </div>
 </template>
 
 <script>
-import Hello from './components/Hello.vue'
-
 export default {
-  name: 'app',
-  data() {
-      return { user: null }
-  },
-  components: {
-    Hello
-  }
+  name: 'app'
 }
 </script>

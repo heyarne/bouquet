@@ -1,7 +1,7 @@
 {{#if user}}
     <h1>Welcome {{user.email}}!</h1>
     <p>
-        Are you looking for your dashboard? Click <a href="/app">here</a>!
+        Are you looking for your dashboard? Click <a href="/app/">here</a>!
         <form action="/auth/logout" method="post">No? Maybe <input type="submit" value="logout" /> instead?</form>
     </p>
 {{else}}

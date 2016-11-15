@@ -12,7 +12,7 @@
       Hello {{ user.email }}!
     </div>
 
-    <div class="create-trip" v-if="!user.trips.length">
+    <div class="create-trip" v-if="!(user && user.trips.length)">
       It seems like you don't have created any trips yet. Do you want to <router-link to="/trip/new">create a new one?</router-link>
     </div>
   </div>

@@ -32,7 +32,7 @@ $ cd public
 $ # There are other dependencies for the frontend, ensure to install them as well
 $ npm install
 $ # Build and watch the vuejs app (with hot module replacement)
-$ npm run watchify
+$ npm run dev
 $ # ... or build the vuejs app once
 $ npm run build
 ```

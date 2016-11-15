@@ -1,4 +1,4 @@
-const User = require('../models/user')
+const { User } = require('../models/user')
 
 /**
  * Middleware that exposes the user as `req.user` if there is a session.

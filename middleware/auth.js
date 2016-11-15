@@ -11,7 +11,7 @@ const fetch = require('node-fetch')
 const uuid = require('uuid')
 const redis = require('redis').createClient()
 
-const User = require('../models/user')
+const { User } = require('../models/user')
 
 const debug = require('debug')('bouquet:auth')
 const router = require('express').Router()

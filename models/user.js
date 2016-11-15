@@ -1,8 +1,12 @@
 const mongoose = require('mongoose')
+const { tripSchema } = require('./trip')
 
-const UserSchema = mongoose.Schema({ email: String })
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true },
+  trips: [tripSchema]
+})
 
-UserSchema.statics = {
+userSchema.statics = {
   findOrCreate (conditions, options) {
     return User.findOne(conditions).exec()
       .then(user => user
@@ -11,6 +15,8 @@ UserSchema.statics = {
   }
 }
 
-const User = mongoose.model('User', UserSchema)
+const User = mongoose.model('User', userSchema)
 
-module.exports = User
+module.exports = {
+  userSchema, User
+}

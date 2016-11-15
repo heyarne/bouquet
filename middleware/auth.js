@@ -11,11 +11,10 @@ const fetch = require('node-fetch')
 const uuid = require('uuid')
 const redis = require('redis').createClient()
 
-const { Router } = require('express')
 const User = require('../models/user')
 
 const debug = require('debug')('bouquet:auth')
-const router = Router()
+const router = require('express').Router()
 
 /**
  * Converts an object holding JSON Webkeys to an object in the form

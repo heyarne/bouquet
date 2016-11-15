@@ -33,9 +33,9 @@ app.use(session({
   })
 }))
 
-// expose current account as `req.user` if a session is established
-const user = require('./middleware/user')
-app.use(user())
+// set up session enhancers
+const { exposeCurrentUser } = require('./middleware/session-utils')
+app.use(exposeCurrentUser())
 
 // authentication and authorization via portier
 const auth = require('./middleware/auth')
@@ -56,6 +56,10 @@ app.get('/app', (req, res) => req.user ? res.render('app') : res.redirect('/')) 
 // serve our js and css resources
 const serveStatic = require('serve-static')
 app.use('/dist', serveStatic(__dirname + '/public/dist'))
+
+// finally, expose our api routes
+const users = require('./middleware/api/users')
+app.use('/api/v1/users', users)
 
 module.exports = app
 

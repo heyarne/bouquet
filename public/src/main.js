@@ -14,7 +14,8 @@ Vue.use(VueRouter)
 
 // Configure VueResource
 Vue.http.options = {
-  root: '/api/v1'
+  root: '/api/v1',
+  credentials: true
 }
 
 function debugLog (req, next) {
@@ -22,13 +23,7 @@ function debugLog (req, next) {
   next()
 }
 
-function addCredentials (req, next) {
-  req.credentials = true
-  next()
-}
-
 Vue.http.interceptors.push(debugLog)
-Vue.http.interceptors.push(addCredentials)
 
 // Configure VueRouter
 // import all of the components which end up being the main views

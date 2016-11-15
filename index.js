@@ -55,6 +55,7 @@ app.get('/app', (req, res) => req.user ? res.render('app') : res.redirect('/')) 
 
 // serve our js and css resources
 const serveStatic = require('serve-static')
+app.use('/bulma', serveStatic(__dirname + '/public/node_modules/bulma/css'))
 app.use('/dist', serveStatic(__dirname + '/public/dist'))
 
 // finally, expose our api routes

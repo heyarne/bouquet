@@ -22,7 +22,7 @@ export default {
 
   // Initial data
   data () {
-     return {
+    return {
       loading: false,
       user: null,
       error: null

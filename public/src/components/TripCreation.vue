@@ -63,7 +63,7 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return { trip: null }
   },
   methods: {

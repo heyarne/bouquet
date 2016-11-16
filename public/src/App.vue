@@ -29,7 +29,11 @@ export default {
   methods: {
     logout () {
       this.$http.post('/auth/logout')
-        .then(_ => window.location.href = '/')
+        .then(_ => {
+          // redirect to landing page
+          window.location.hash = ''
+          window.location.href = '/'
+        })
     }
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <section class="hero is-primary">
+    <header class="hero is-primary">
       <nav class="nav has-shadow">
         <div class="container">
           <div class="nav-left">
@@ -14,7 +14,7 @@
           </div>
         </div>
       </nav>
-    </section>
+    </header>
     <section class="section">
       <div class="container">
         <router-view />

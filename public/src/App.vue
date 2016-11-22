@@ -20,6 +20,11 @@
         <router-view />
       </div>
     </section>
+    <footer class="footer">
+      <div class="container has-text-right">
+        Made with ❤ and 💦
+      </div>
+    </footer>
   </div>
 </template>
 

@@ -8,11 +8,11 @@
       None of this is going to be shared or published, no worries.
     </p>
     <hr>
-    <form method="post">
+    <form method="post" @submit="handleSubmit">
+      <h2 class="subtitle">Tell us about the journey&hellip;</h2>
       <div class="columns">
-        <div class="column is-one-third"><h2 class="subtitle">Tell us about the journey&hellip;</h2></div>
         <div class="column">
-          <p class="control">
+          <p class="controls">
             I want to travel from
             <input type="text" name="from" placeholder="place of departure" v-bind:value="trip && trip.from">
             to
@@ -20,42 +20,46 @@
           </p>
         </div>
       </div>
+      <h2 class="subtitle">When would be a good time?</h2>
       <div class="columns">
-        <div class="column is-one-third">
-          <h2 class="subtitle">When would be a good time?</h2>
-        </div>
         <div class="column">
-          <p class="control">
+          <p class="controls">
             Sometime between
             <input type="text" name="availability-start" placeholder="earliest date" v-bind:value="trip && trip.availability.start">
             and
             <input type="text" name="availability-end" placeholder="latest date of return" v-bind:value="trip && trip.availability.end">.
+            <!-- TODO: Add additional timeframes -->
           </p>
         </div>
       </div>
+      <h2 class="subtitle">For how long do you want to travel?</h2>
       <div class="columns">
-        <div class="column is-one-third">
-          <h2 class="subtitle">How long do you want to travel?</h2>
-        </div>
         <div class="column">
-          <p class="control">
+          <p class="controls">
             <label class="radio">
               <input type="radio" name="open-end" value="0" checked>
               <input type="text" name="duration" v-bind="trip && trip.duration">
               days.
             </label>
+          </p>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column">
+          <p class="controls">
             <label class="radio">
               <input type="radio" name="open-end" value="1">
-              Don't look for flights back just yet
+              Don't look for flights back just yet.
             </label>
           </p>
         </div>
       </div>
       <div class="columns">
-        <p class="controls">
-          <input type="submit" class="button" value="Create trip">
-
-        </p>
+        <div class="column is-clearfix">
+          <p class="controls is-pulled-right">
+            <input type="submit" class="button is-medium is-primary" value="Create trip">
+          </p>
+        </div>
       </div>
     </form>
   </div>
@@ -67,7 +71,13 @@ export default {
     return { trip: null }
   },
   methods: {
-
+    handleSubmit () {
+      debugger
+      this.$http.post('trips')
+        .then(res => res.json())
+        .then(_ => { /* creation successful */ })
+        .catch(err => console.error(err))
+    }
   }
 }
 </script>

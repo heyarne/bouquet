@@ -14,7 +14,6 @@
         <div class="column">
           <p class="controls">
             I want to travel from
-            <auto-complete />
             <input type="text" name="from" placeholder="place of departure" v-bind:value="trip && trip.from" @keyup="">
             to
             <input type="text" name="to" placeholder="destination" v-bind:value="trip && trip.to">.

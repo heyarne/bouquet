@@ -25,6 +25,9 @@ export default {
       this.type = n.type === 'error' ? 'danger' : 'info'
       this.message = n.message
       this.shown = true
+
+      // automatically hide the timeout after a while
+      setTimeout(_ => this.shown = false, n.type === 'error' ? 10000 : 1000)
     })
   }
 }

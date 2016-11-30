@@ -59,7 +59,9 @@ app.use('/dist', serveStatic(__dirname + '/public/dist'))
 
 // finally, expose our api routes
 const users = require('./middleware/api/users')
+const trips = require('./middleware/api/trips')
 app.use('/api/v1/users', users)
+app.use('/api/v1/trips', trips)
 
 module.exports = app
 

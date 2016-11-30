@@ -14,9 +14,9 @@
         <div class="column">
           <p class="controls">
             I want to travel from
-            <input type="text" name="from" placeholder="place of departure" v-model="departure" @keyup="">
+            <input type="text" name="from" placeholder="place of departure" v-model="trip.departure" @keyup="">
             to
-            <input type="text" name="to" placeholder="destination" v-model="destination">.
+            <input type="text" name="to" placeholder="destination" v-model="trip.destination">.
           </p>
         </div>
       </div>
@@ -25,9 +25,9 @@
         <div class="column">
           <p class="controls">
             Sometime between
-            <input type="text" name="availability-start" placeholder="earliest date" v-model="startDate">
+            <input type="text" name="availability-start" placeholder="earliest date" v-model="trip.startDate">
             and
-            <input type="text" name="availability-end" placeholder="latest date of return" v-model="endDate">.
+            <input type="text" name="availability-end" placeholder="latest date of return*" v-model="trip.endDate">.
             <!-- TODO: Add additional timeframes -->
           </p>
         </div>
@@ -36,21 +36,9 @@
       <div class="columns">
         <div class="column">
           <p class="controls">
-            <label class="radio">
-              <input type="radio" name="open-end" value="0" checked>
-              <input type="text" name="duration" v-model="duration">
-              days.
-            </label>
-          </p>
-        </div>
-      </div>
-      <div class="columns">
-        <div class="column">
-          <p class="controls">
-            <label class="radio">
-              <input type="radio" name="open-end" value="1">
-              Don't look for flights back just yet.
-            </label>
+            <input type="text" name="duration" v-model="trip.duration">
+            days.*
+            <span class="help">* Optional</span>
           </p>
         </div>
       </div>
@@ -66,22 +54,37 @@
 </template>
 
 <script>
+/* eslint-env browser */
+import router from '../router'
 import eventBus from '../event-bus'
 import AutoComplete from './forms/AutoComplete.vue'
 
 export default {
   components: { AutoComplete },
-  data () { return {} },
+  data () {
+    return {
+      trip: {
+        departure: null,
+        destination: null,
+        startDate: null,
+        endDate: null,
+        openEnd: null
+      }
+    }
+  },
   methods: {
     handleSubmit () {
-      eventBus.$emit('notification', 'submit')
-      this.$http.post('trips')
+      this.$http.post('trips', this.trip)
         .then(res => res.json())
-        .then(_ => { /* creation successful */ })
-        .catch(err => { eventBus.$emit('notification', {
-          type: 'error', message: err.body.message
+        .then(res => {
+          router.replace('/')
+          eventBus.$emit('notification', {
+            type: 'info', message: 'OK, we\'ll keep an eye out! :)'
+          })
         })
-      })
+        .catch(err => eventBus.$emit('notification', {
+          type: 'error', message: err.body.message
+        }))
     }
   }
 }

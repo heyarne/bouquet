@@ -15,6 +15,7 @@
         </div>
       </nav>
     </header>
+    <toast />
     <section class="section">
       <div class="container">
         <router-view />
@@ -29,8 +30,11 @@
 </template>
 
 <script>
+import Toast from './components/Toast.vue'
+
 export default {
   name: 'app',
+  components: { Toast },
   methods: {
     logout () {
       this.$http.post('/auth/logout')

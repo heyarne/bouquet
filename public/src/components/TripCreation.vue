@@ -8,15 +8,15 @@
       None of this is going to be shared or published, no worries.
     </p>
     <hr>
-    <form method="post" @submit="handleSubmit">
+    <form method="post" @submit.prevent="handleSubmit">
       <h2 class="subtitle">Tell us about the journey&hellip;</h2>
       <div class="columns">
         <div class="column">
           <p class="controls">
             I want to travel from
-            <input type="text" name="from" placeholder="place of departure" v-bind:value="trip && trip.from" @keyup="">
+            <input type="text" name="from" placeholder="place of departure" v-model="departure" @keyup="">
             to
-            <input type="text" name="to" placeholder="destination" v-bind:value="trip && trip.to">.
+            <input type="text" name="to" placeholder="destination" v-model="destination">.
           </p>
         </div>
       </div>
@@ -25,9 +25,9 @@
         <div class="column">
           <p class="controls">
             Sometime between
-            <input type="text" name="availability-start" placeholder="earliest date" v-bind:value="trip && trip.availability.start">
+            <input type="text" name="availability-start" placeholder="earliest date" v-model="startDate">
             and
-            <input type="text" name="availability-end" placeholder="latest date of return" v-bind:value="trip && trip.availability.end">.
+            <input type="text" name="availability-end" placeholder="latest date of return" v-model="endDate">.
             <!-- TODO: Add additional timeframes -->
           </p>
         </div>
@@ -38,7 +38,7 @@
           <p class="controls">
             <label class="radio">
               <input type="radio" name="open-end" value="0" checked>
-              <input type="text" name="duration" v-bind="trip && trip.duration">
+              <input type="text" name="duration" v-model="duration">
               days.
             </label>
           </p>
@@ -66,20 +66,22 @@
 </template>
 
 <script>
+import eventBus from '../event-bus'
 import AutoComplete from './forms/AutoComplete.vue'
 
 export default {
   components: { AutoComplete },
-  data () {
-    return { trip: null }
-  },
+  data () { return {} },
   methods: {
     handleSubmit () {
-      debugger
+      eventBus.$emit('notification', 'submit')
       this.$http.post('trips')
         .then(res => res.json())
         .then(_ => { /* creation successful */ })
-        .catch(err => console.error(err))
+        .catch(err => { eventBus.$emit('notification', {
+          type: 'error', message: err.body.message
+        })
+      })
     }
   }
 }

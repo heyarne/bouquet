@@ -1,9 +1,13 @@
 const mongoose = require('mongoose')
-const { tripSchema } = require('./trip')
+const Trip = {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'Trip',
+  required: true
+}
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true },
-  trips: [tripSchema]
+  trips: [Trip]
 })
 
 userSchema.statics = {

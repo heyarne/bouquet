@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const { userSchema } = require('./user')
 
 const tripSchema = new mongoose.Schema({
   user: {
@@ -8,13 +7,13 @@ const tripSchema = new mongoose.Schema({
     required: true
   },
   // Airport for departure
-  departure: { type: Object, required: true },
+  departure: { type: String, required: true },
   // Airport for destination
-  destination: { type: Object, required: true },
+  destination: { type: String, required: true },
   // Start of search
-  startDate: { type: Object, required: true },
+  startDate: { type: Date, required: true },
   // End of search
-  endDate: { type: Object },
+  endDate: { type: Date },
   // Duration of trip
   duration: { type: Object }
 })

@@ -1,12 +1,13 @@
 // load environment variables defined in .env
 require('dotenv').load()
+const { MONGODB_URI, SESSION_SECRET, SERVER_PORT } = process.env
 
-const debug = require('debug')('bouquet:index') // eslint-disable-line
+const debug = require('debug')('bouquet:server')
 
 // set up database
 const mongoose = require('mongoose')
 mongoose.Promise = global.Promise
-mongoose.connect(process.env.MONGODB_URI)
+mongoose.connect(MONGODB_URI, _ => console.log(`Mongoose connected to ${MONGODB_URI}`))
 
 // set up the server
 const express = require('express')
@@ -25,11 +26,11 @@ app.use(bodyParser.urlencoded({
   extended: true // parse with `qs`, thus enabling stuff like arrays
 }))
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: SESSION_SECRET,
   saveUninitialized: false, // save session when it's not initialized
   resave: false,            // save the session back even when it's unmodified (check if store implements `touch`)
   store: new SessionStore({
-    url: process.env.MONGODB_URI
+    url: MONGODB_URI
   })
 }))
 
@@ -66,6 +67,6 @@ app.use('/api/v1/trips', trips)
 module.exports = app
 
 if (!module.parent) {
-  const port = process.env.SERVER_PORT
+  const port = SERVER_PORT
   app.listen(port, _ => console.log(`Server started on port ${port}`))
 }

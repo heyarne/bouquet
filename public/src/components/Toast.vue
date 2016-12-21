@@ -27,7 +27,7 @@ export default {
       this.shown = true
 
       // automatically hide the timeout after a while
-      setTimeout(_ => this.shown = false, n.type === 'error' ? 10000 : 1000)
+      setTimeout(_ => this.shown = false, n.type === 'error' ? 10000 : 5000)
     })
   }
 }

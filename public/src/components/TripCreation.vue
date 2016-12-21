@@ -25,9 +25,9 @@
         <div class="column">
           <p class="controls">
             Sometime between
-            <input type="text" name="availability-start" placeholder="earliest date" v-model="trip.startDate">
+            <input type="text" name="availability-start" placeholder="earliest date (YYYY-MM-DD)" v-model="trip.startDate">
             and
-            <input type="text" name="availability-end" placeholder="latest date of return*" v-model="trip.endDate">.
+            <input type="text" name="availability-end" placeholder="latest date of return (YYYY-MM-DD)*" v-model="trip.endDate">.
             <!-- TODO: Add additional timeframes -->
           </p>
         </div>
@@ -74,7 +74,11 @@ export default {
   },
   methods: {
     handleSubmit () {
-      this.$http.post('trips', this.trip)
+      const trip = this.trip
+      trip.startDate = new Date(trip.startDate).toJSON()
+      trip.endDate = trip.endDate ? new Date(trip.endDate).toJSON() : null
+
+      this.$http.post('trips', trip)
         .then(res => res.json())
         .then(res => {
           router.replace('/')

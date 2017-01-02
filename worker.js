@@ -45,19 +45,20 @@ function searchSkyScanner (trip) {
     .then(res => Promise[res.ok ? 'resolve' : 'reject'](res.json()))
     // continue working with this result if everything's fine
     .then(response => Promise.resolve({ trip, response }))
-    // remove invalid results from database
-    .catch(err => {
+    // if we have an error, resolve it and print it. we don't want it to stop
+    // further processing though, so we catch it early
+    .catch(err =>
       err.then(err => {
         console.error(`Bad response for ${trip._id}`)
-        console.error(util.inspect(err))
+        console.error(err)
+        debug(util.inspect(err))
       })
-    })
+    )
 }
 
 function handleResults (responses) {
   debug(`${responses.length} good responses`, util.inspect(responses))
   responses
-    .filter(res => res != null)
     .forEach(({ trip, response }) => {
       // save each returned result
       const quotes = response.Quotes
@@ -65,7 +66,7 @@ function handleResults (responses) {
       const places = {}
       response.Places.forEach(place => { places[place.PlaceId] = place })
 
-      // TODO: Notify user of this result and handle error
+      // TODO: Notify user of this result
       return Promise.all(quotes.map(quote =>
           new SearchResult({
             trip: trip._id,
@@ -87,8 +88,8 @@ function handleResults (responses) {
       .then(results => {
         const ids = results.map(r => r._id)
         debug(`Saved results with ids ${ids.join(', ')}`)
+        return Promise.resolve(true) // final promise signifying everything went ok
       })
-      .catch(err => console.error(err))
     })
 }
 
@@ -96,16 +97,25 @@ function work () {
   debug('Requesting trip data...')
   // TODO: Get only trips starting at least now
   // get pending trips from database
-  Trip.find()
+  return Trip.find()
     .exec()
     // request trip data from skyscanner
     .then(trips => Promise.all(trips.map(searchSkyScanner)))
+    // filter out the requests that went wrong
+    .then(responses => Promise.resolve(responses.filter(res => res != null)))
     // get the responses that went well and went not so well and treat them accordingly
     .then(handleResults)
-    .catch(err => console.error(err))
 }
 
 // if run from the command line...
 if (!module.parent) {
   work()
+    .then(_ => {
+      debug(`All done!`)
+      process.exit(0)
+    })
+    .catch(err => {
+      console.error(err)
+      process.exit(1)
+    })
 }

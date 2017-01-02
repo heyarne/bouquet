@@ -9,12 +9,13 @@ const jwt = require('jsonwebtoken')
 const jkwToPem = require('jwk-to-pem')
 const fetch = require('node-fetch')
 const uuid = require('uuid')
-const redis = require('redis').createClient()
-
+const redis = require('redis').createClient(process.env.REDIS_SOCKET)
 const { User } = require('../models/user')
 
 const debug = require('debug')('bouquet:auth')
 const router = require('express').Router()
+
+console.log(`Using redis socket at ${process.env.REDIS_SOCKET}`)
 
 /**
  * Converts an object holding JSON Webkeys to an object in the form

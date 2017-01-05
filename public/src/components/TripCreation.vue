@@ -25,9 +25,9 @@
         <div class="column">
           <p class="controls">
             Sometime between
-            <input type="text" name="availability-start" placeholder="earliest date (YYYY-MM-DD)" v-model="trip.startDate">
+            <flatpickr name="availability-start" placeholder="earliest date" v-model="trip.startDate" :options="config.datePicker" />
             and
-            <input type="text" name="availability-end" placeholder="latest date of return (YYYY-MM-DD)*" v-model="trip.endDate">.
+            <flatpickr name="availability-end" placeholder="latest date of return*" v-model="trip.endDate" :options="config.datePicker" />.
             <!-- TODO: Add additional timeframes -->
           </p>
         </div>
@@ -57,10 +57,11 @@
 /* eslint-env browser */
 import router from '../router'
 import eventBus from '../event-bus'
-import AutoComplete from './forms/AutoComplete.vue'
+
+import Flatpickr from 'vue-flatpickr'
 
 export default {
-  components: { AutoComplete },
+  components: { Flatpickr },
   data () {
     return {
       trip: {
@@ -69,6 +70,12 @@ export default {
         startDate: null,
         endDate: null,
         openEnd: null
+      },
+      config: {
+        datePicker: {
+          minDate: 'today',
+          utc: true
+        }
       }
     }
   },

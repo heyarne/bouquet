@@ -27,7 +27,7 @@ function mapKeyIdsToPem ({ keys }) {
   const val = {}
   keys
     .filter(key => key.alg === 'RS256')
-    .forEach(key => val[key.kid] = jkwToPem(key))
+    .forEach(key => { val[key.kid] = jkwToPem(key) })
   return val
 }
 
@@ -176,7 +176,7 @@ router.post('/verify', (req, res, next) => {
     // TODO: Proper error handling (not in this middleware)
     res
       .status(400)
-      .json({ error: `Broker Error (${error}): ${error_description}` })
+      .json({ error: `Broker Error (${error}): ${error_description}` }) // eslint-disable-line
     return next()
   }
 

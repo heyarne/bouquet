@@ -1,6 +1,6 @@
 <template lang="html">
-  <div class="box">
-    <a class="media">
+  <a class="box">
+    <article class="media">
       <div class="media-left">
         <figure class="image is-64x64">
           <img src="http://bulma.io/images/placeholders/128x128.png" alt="Image">
@@ -16,8 +16,8 @@
         </div>
         <div class="level"></div>
       </div>
-    </a>
-  </div>
+    </article>
+  </a>
 </template>
 
 <script>
@@ -25,9 +25,3 @@ export default {
   props: ['trip']
 }
 </script>
-
-<style type="text/css" scoped>
-a.media {
-  border-bottom: none
-}
-</style>

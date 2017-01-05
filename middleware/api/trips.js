@@ -20,6 +20,11 @@ router.post('/', (req, res) => {
   console.log(payload)
 
   new Trip(payload).save()
+    .then(trip => {
+      // update the user and re-return the trip
+      req.user.trips.push(trip._id)
+      return req.user.save().then(_ => Promise.resolve(trip))
+    })
     .then(trip => res.status(201).json(trip))
     .catch(({ message }) => res.status(500).json({ message }))
 })

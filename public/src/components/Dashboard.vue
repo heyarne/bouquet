@@ -9,10 +9,16 @@
     </article>
 
     <div class="user" v-if="user">
-      <div>Hello {{ user.email }}!</div>
-      <div v-if="!user.trips.length">
+      <h2>Hello {{ user.email }}!</h2>
+      <p v-if="!user.trips.length">
         It seems like you don't have created any trips yet. Do you want to <router-link to="/trip/new">create a new one?</router-link>
-      </div>
+      </p>
+      <p v-else>
+        You currently have <strong>{{user.trips.length}} trip<span v-if="user.trips.lengh === 1">s</span></strong> planned.
+      </p>
+      <p class="control">
+        <router-link to="/trip/new" class="button is-primary">Add trip</router-link>
+      </p>
     </div>
   </div>
 </template>

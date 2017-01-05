@@ -10,9 +10,15 @@
 
     <div class="user" v-if="user">
       <h2>Hello {{ user.email }}!</h2>
-      <p v-if="!trips.length">
-        It seems like you don't have created any trips yet. Do you want to <router-link to="/trip/new">create a new one?</router-link>
-      </p>
+      <div v-if="!trips.length">
+        <p>
+          Thanks for trying out bouquet.<br>
+          The idea is that you can save trips you never really got around taking. Tell us when you want to go and what your budget is more or less and we'll alert you as soon as we find something.
+        </p>
+        <p>
+          It seems like you don't have created any trips yet. Do you want to <router-link to="/trip/new">create a new one?</router-link>
+        </p>
+      </div>
       <p v-else>
         You currently have <strong>{{trips.length}} trip<span v-if="trips.length !== 1">s</span></strong> planned.
       </p>

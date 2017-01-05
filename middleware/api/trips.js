@@ -1,13 +1,8 @@
 const router = require('express').Router()
-const { isLoggedIn } = require('../session-utils')
+const { requireLogin } = require('../session-utils')
 const { Trip } = require('../../models/trip')
 
-router.post('/', (req, res) => {
-  // TODO: DRY
-  if (!isLoggedIn(req)) {
-    return res.status(403).json({ message: 'No session established' })
-  }
-
+router.post('/', requireLogin(), (req, res) => {
   const payload = {
     user: req.user._id,
     departure: req.body.departure,
@@ -29,12 +24,7 @@ router.post('/', (req, res) => {
     .catch(({ message }) => res.status(500).json({ message }))
 })
 
-router.get('/me', (req, res) => {
-  // TODO: DRY
-  if (!isLoggedIn(req)) {
-    return res.status(403).json({ message: 'No session established' })
-  }
-
+router.get('/me', requireLogin(), (req, res) => {
   Trip.find({ _id: { $in: req.user.trips } })
     .then(trips => res.status(200).json(trips))
     .catch(({ message }) => res.status(500).json({ message }))

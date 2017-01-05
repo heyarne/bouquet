@@ -32,8 +32,10 @@ function isLoggedIn (req) {
 }
 
 module.exports = {
+
   isLoggedIn,
   exposeCurrentUser () {
     return exposeCurrentUser
   }
+
 }

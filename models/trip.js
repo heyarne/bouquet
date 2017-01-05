@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const timestamps = require('mongoose-timestamp')
 
 const tripSchema = new mongoose.Schema({
   user: {
@@ -17,6 +18,9 @@ const tripSchema = new mongoose.Schema({
   // Duration of trip
   duration: { type: Object }
 })
+
+// add createdAt and updatedAt fields
+tripSchema.plugin(timestamps)
 
 const Trip = mongoose.model('Trip', tripSchema)
 

@@ -24,7 +24,7 @@
       </p>
       <ul>
         <li v-for="trip in trips">
-          <trip-card v-bind:trip="trip"></trip>
+          <trip-card :trip="trip"></trip>
         </li>
       </ul>
       <p class="control">

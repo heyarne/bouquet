@@ -1,7 +1,7 @@
 // The following line loads the standalone build of Vue instead of the runtime-only build,
 // so you don't have to do: import Vue from 'vue/dist/vue'
 // This is done with the browser options. For the config, see package.json
-const DEBUG = true
+const DEBUG = process.env.NODE_ENV !== 'production'
 
 import Vue from 'vue'
 if (DEBUG) window.Vue = Vue
@@ -18,12 +18,14 @@ Vue.http.options = {
   credentials: true
 }
 
-function debugLog (req, next) {
-  if (DEBUG) console.log(req)
-  next()
-}
+if (DEBUG) {
+  function debugLog (req, next) {
+    console.log(req)
+    next()
+  }
 
-Vue.http.interceptors.push(debugLog)
+  Vue.http.interceptors.push(debugLog)
+}
 
 import router from './router'
 import App from './App.vue'

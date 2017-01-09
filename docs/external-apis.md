@@ -9,7 +9,7 @@ to the official docs or additional useful information.
 ### Fetching quotes
 
 URL: `http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/${market}/${currency}/${locale}/${departure}/${destination}/${startDate}/${endDate}`
-Note: `startDate` and `endDate` take the form `YYYY-MM-DD`
+Note: `startDate` and `endDate` take the form `YYYY-MM-DD` or YYYY-MM
 Example response:
 ``` js
 [ { Quotes:

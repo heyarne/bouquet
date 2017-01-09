@@ -21,23 +21,28 @@ const { Trip } = require('./models/trip')
 const { SearchResult } = require('./models/search-result')
 
 function toSkyScannerDate (date) {
-  const month = ('0' + date.getMonth() + 1).substr(-2)
-  const day = ('0' + date.getDate()).substr(-2)
-  return `${date.getFullYear()}-${month}-${day}`
+  const month = ('0' + (date.getMonth() + 1)).substr(-2)
+  return `${date.getFullYear()}-${month}`
 }
 
-function searchSkyScanner (trip) {
+function convertDates (...dates) {
+  return dates
+    .filter(date => date != null) // we don't necessarily have an endDate
+    .map(toSkyScannerDate)
+    .join('/')
+}
+
+function skyScannerURL (trip) {
   const market = 'DE'
   const currency = 'EUR'
   const locale = 'en'
   const { departure, destination, startDate, endDate } = trip
 
-  const url = `http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/${market}/${currency}/${locale}/${departure}/${destination}/` +
-    [ startDate, endDate ]
-      .filter(date => date != null) // we don't necessarily have an endDate
-      .map(toSkyScannerDate)
-      .join('/') +
-    `?apiKey=${SKYSCANNER_API_KEY}`
+  return `http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/${market}/${currency}/${locale}/${departure}/${destination}/${convertDates(startDate, endDate)}?apiKey=${SKYSCANNER_API_KEY}`
+}
+
+function searchSkyScanner (trip) {
+  const url = skyScannerURL(trip)
 
   debug(`Requesting ${url}`)
   return fetch(url)
@@ -58,39 +63,39 @@ function searchSkyScanner (trip) {
 
 function handleResults (responses) {
   debug(`${responses.length} good responses`, util.inspect(responses))
-  responses
-    .forEach(({ trip, response }) => {
+  return Promise.all(responses
+    .map(({ trip, response }) => {
       // save each returned result
       const quotes = response.Quotes
+      const cheapest = quotes.sort((a, b) => a.MinPrice > b.MinPrice)[0]
       const currency = response.Currencies[0].Code
       const places = {}
       response.Places.forEach(place => { places[place.PlaceId] = place })
 
-      // TODO: Notify user of this result
-      return Promise.all(quotes.map(quote =>
-          new SearchResult({
-            trip: trip._id,
-            date: new Date(quote.OutboundLeg.DepartureDate),
-            departure: {
-              name: places[quote.OutboundLeg.OriginId].Name,
-              platformIdentifier: places[quote.OutboundLeg.OriginId].SkyscannerCode
-            },
-            destination: {
-              name: places[quote.OutboundLeg.DestinationId].Name,
-              platformIdentifier: places[quote.OutboundLeg.DestinationId].SkyscannerCode
-            },
-            platform: 'skyscanner',
-            price: quote.MinPrice,
-            currency
-          }).save()
-        )
-      )
-      .then(results => {
-        const ids = results.map(r => r._id)
-        debug(`Saved results with ids ${ids.join(', ')}`)
-        return Promise.resolve(true) // final promise signifying everything went ok
-      })
-    })
+      if (cheapest) {
+        // TODO: Notify user of this result if it's below thei
+        return new SearchResult({
+          trip: trip._id,
+          date: new Date(cheapest.OutboundLeg.DepartureDate),
+          departure: {
+            name: places[cheapest.OutboundLeg.OriginId].Name,
+            platformIdentifier: places[cheapest.OutboundLeg.OriginId].SkyscannerCode
+          },
+          destination: {
+            name: places[cheapest.OutboundLeg.DestinationId].Name,
+            platformIdentifier: places[cheapest.OutboundLeg.DestinationId].SkyscannerCode
+          },
+          platform: 'skyscanner',
+          price: cheapest.MinPrice,
+          currency
+        })
+        .save()
+        .then(r => Promise.resolve(r._id))
+      } else {
+        // continue with `undefined` to signal that there's no result
+        return Promise.resolve()
+      }
+    }))
 }
 
 function work () {
@@ -110,8 +115,9 @@ function work () {
 // if run from the command line...
 if (!module.parent) {
   work()
-    .then(_ => {
+    .then(ids => {
       debug(`All done!`)
+      debug(`Saved ${ids.filter(i => i).length} new results`)
       process.exit(0)
     })
     .catch(err => {

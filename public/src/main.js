@@ -19,12 +19,10 @@ Vue.http.options = {
 }
 
 if (DEBUG) {
-  function debugLog (req, next) {
+  Vue.http.interceptors.push(function debugLog (req, next) {
     console.log(req)
     next()
-  }
-
-  Vue.http.interceptors.push(debugLog)
+  })
 }
 
 import router from './router'

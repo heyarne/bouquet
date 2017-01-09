@@ -38,7 +38,7 @@ function skyScannerURL (trip) {
   const currency = 'EUR'
   const locale = 'en'
   const { departure, destination, startDate, endDate } = trip
-  const service = endDate ? 'browsequotes' : 'browsequotes'
+  const service = endDate ? 'browsegrid' : 'browsequotes'
 
   return `http://partners.api.skyscanner.net/apiservices/${service}/v1.0/${market}/${currency}/${locale}/${departure}/${destination}/${convertDates(startDate, endDate)}?apiKey=${SKYSCANNER_API_KEY}`
 }
@@ -63,7 +63,7 @@ function searchSkyScanner (trip) {
     )
 }
 
-function cheapestTrip (response, trip) {
+function cheapestFromQuotes (response, trip) {
   const quotes = response.Quotes
   const currency = response.Currencies[0].Code
   const places = {}
@@ -98,10 +98,53 @@ function cheapestTrip (response, trip) {
   }
 }
 
+function cheapestFromGrid (response, trip) {
+  const currency = response.Currencies[0].Code
+  const departures = response.Dates[0].slice(1) // undefined, { DateString: ... }, { DateString: ... }
+  const cheapest = response.Dates.slice(1) // { DateString: ... }, undefined, { MinPrice: ..., QuoteTime: ... }, ...
+    // transform the grid for all non-undefined values
+    .map(row =>
+      row.slice(1).map((date, i) => date && {
+        'departure': departures[i].DateString,
+        'return': date.DateString,
+        'price': date.MinPrice
+      })
+    )
+    // flatten the array
+    .reduce((a, b) => a.concat(b))
+    // filter out nulls
+    .filter(r => r)
+    // sort by price
+    .sort((a, b) => a.price < b)[0]
+
+  if (cheapest) {
+    return {
+      trip: trip._id,
+      date: new Date(cheapest.departure),
+      // TODO: Think of a better way for depature name, or how to map the result back to the platform in order to link it
+      // There is no identifier or name for each and every result in the grid,
+      // just something like a summary.
+      departure: {
+        name: 'TODO',
+        platformIdentifier: 'TODO'
+      },
+      destination: {
+        name: 'TODO',
+        platformIdentifier: 'TODO'
+      },
+      platform: 'skyscanner',
+      price: cheapest.price,
+      currency
+    }
+  }
+}
+
 function getCheapestTrips (responses) {
   debug(`${responses.length} good responses`, util.inspect(responses))
   return Promise.resolve(
-    responses.map(({ response, trip }) => cheapestTrip(response, trip))
+    responses.map(({ response, trip }) =>
+      trip.endDate ? cheapestFromGrid(response, trip) : cheapestFromQuotes(response, trip)
+    )
   )
 }
 

@@ -16,7 +16,13 @@ const tripSchema = new mongoose.Schema({
   // End of search
   endDate: { type: Date },
   // Duration of trip
-  duration: { type: Object }
+  duration: { type: Object },
+  // should it be searched for at the moment?
+  active: {
+    type: Boolean,
+    required: true,
+    default: true
+  }
 })
 
 // add createdAt and updatedAt fields

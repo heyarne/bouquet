@@ -14,6 +14,7 @@ const util = require('util')
 const fetch = require('node-fetch')
 const debug = require('debug')('bouquet:worker')
 const mongoose = require('mongoose')
+const moment = require('moment')
 
 mongoose.Promise = global.Promise
 mongoose.connect(MONGODB_URI, _ => console.log(`Mongoose connected to ${MONGODB_URI}`))
@@ -148,11 +149,33 @@ function getCheapestTrips (responses) {
   )
 }
 
-function work () {
+/**
+ * Removes trips older than a month and deactivates the ones that's in the past
+ * @return {Promise}
+ */
+function cleanupOldtrips () {
+  debug('Cleaning up old trips')
+  const today = moment().startOf('day')
+  return Trip.where({ endDate: { $lt: today.subtract(1, 'month').format() } })
+    .remove()
+    .exec()
+    .then(_ =>
+      Trip.where({ endDate: { $lt: today.subtract(1, 'month').format() } })
+        .update({ active: false }, { multi: true })
+        .exec()
+    )
+}
+
+/**
+ * Goes through all the currently active trips and searches for the cheapest
+ * results that match the trips criteria.
+ * @return {Promise}
+ */
+function findCurrentResults () {
   debug('Requesting trip data...')
-  // TODO: Get only trips starting at least now
+  // TODO: Improve trip cleanup and filtering
   // get pending trips from database
-  return Trip.find()
+  return Trip.find({ active: true })
     .exec()
     // request trip data from skyscanner
     .then(trips => Promise.all(trips.map(searchSkyScanner)))
@@ -164,7 +187,8 @@ function work () {
 
 // if run from the command line...
 if (!module.parent) {
-  work()
+  cleanupOldtrips()
+    .then(findCurrentResults)
     // save all trip data for which we found matching results
     .then(results => SearchResult.collection.insert(results.filter(r => r)))
     // print out for stats

@@ -4,6 +4,7 @@
  * be run periodically.
  *
  * TODO: Support multiple platforms (at the moment it's just skyscanner)
+ * TODO: Notifications (Web UI + E-Mail)
  */
 
 require('dotenv').load()
@@ -37,8 +38,9 @@ function skyScannerURL (trip) {
   const currency = 'EUR'
   const locale = 'en'
   const { departure, destination, startDate, endDate } = trip
+  const service = endDate ? 'browsequotes' : 'browsequotes'
 
-  return `http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/${market}/${currency}/${locale}/${departure}/${destination}/${convertDates(startDate, endDate)}?apiKey=${SKYSCANNER_API_KEY}`
+  return `http://partners.api.skyscanner.net/apiservices/${service}/v1.0/${market}/${currency}/${locale}/${departure}/${destination}/${convertDates(startDate, endDate)}?apiKey=${SKYSCANNER_API_KEY}`
 }
 
 function searchSkyScanner (trip) {
@@ -61,50 +63,46 @@ function searchSkyScanner (trip) {
     )
 }
 
-function handleResults (responses) {
+function cheapestTrip (response, trip) {
+  const quotes = response.Quotes
+  const currency = response.Currencies[0].Code
+  const places = {}
+  response.Places.forEach(place => { places[place.PlaceId] = place })
+
+  // TODO: Subtract duration of trip if there is any
+  const cheapest = quotes
+    .filter(quote => quote.OutboundLeg) // take only non-return journeys
+    .filter(quote => new Date(quote.OutboundLeg.DepartureDate).getTime() >= trip.startDate.getTime())
+    .filter(quote => trip.endDate
+      ? new Date(quote.OutboundLeg.DepartureDate).getTime() <= trip.endDate.getTime()
+      : true
+    )
+    .sort((a, b) => a.MinPrice > b.MinPrice)[0]
+
+  if (cheapest) {
+    return {
+      trip: trip._id,
+      date: new Date(cheapest.OutboundLeg.DepartureDate),
+      departure: {
+        name: places[cheapest.OutboundLeg.OriginId].Name,
+        platformIdentifier: places[cheapest.OutboundLeg.OriginId].SkyscannerCode
+      },
+      destination: {
+        name: places[cheapest.OutboundLeg.DestinationId].Name,
+        platformIdentifier: places[cheapest.OutboundLeg.DestinationId].SkyscannerCode
+      },
+      platform: 'skyscanner',
+      price: cheapest.MinPrice,
+      currency
+    }
+  }
+}
+
+function getCheapestTrips (responses) {
   debug(`${responses.length} good responses`, util.inspect(responses))
-  return Promise.all(responses
-    .map(({ trip, response }) => {
-      // save each returned result
-      const quotes = response.Quotes
-      const currency = response.Currencies[0].Code
-      const places = {}
-
-      const cheapest = quotes
-        .filter(quote => quote.OutboundLeg) // take only non-return journeys
-        .filter(quote => new Date(quote.OutboundLeg.DepartureDate).getTime() >= trip.startDate.getTime())
-        .filter(quote => trip.endDate
-          ? new Date(quote.OutboundLeg.DepartureDate).getTime() <= trip.endDate.getTime()
-          : true
-        ) // TODO: Subtract duration of trip if there is any
-        .sort((a, b) => a.MinPrice > b.MinPrice)[0]
-
-      response.Places.forEach(place => { places[place.PlaceId] = place })
-
-      if (cheapest) {
-        // TODO: Notify user of this result if it's below thei
-        return new SearchResult({
-          trip: trip._id,
-          date: new Date(cheapest.OutboundLeg.DepartureDate),
-          departure: {
-            name: places[cheapest.OutboundLeg.OriginId].Name,
-            platformIdentifier: places[cheapest.OutboundLeg.OriginId].SkyscannerCode
-          },
-          destination: {
-            name: places[cheapest.OutboundLeg.DestinationId].Name,
-            platformIdentifier: places[cheapest.OutboundLeg.DestinationId].SkyscannerCode
-          },
-          platform: 'skyscanner',
-          price: cheapest.MinPrice,
-          currency
-        })
-        .save()
-        .then(r => Promise.resolve(r._id))
-      } else {
-        // continue with `undefined` to signal that there's no result
-        return Promise.resolve()
-      }
-    }))
+  return Promise.resolve(
+    responses.map(({ response, trip }) => cheapestTrip(response, trip))
+  )
 }
 
 function work () {
@@ -118,15 +116,18 @@ function work () {
     // filter out the requests that went wrong
     .then(responses => Promise.resolve(responses.filter(res => res != null)))
     // get the responses that went well and went not so well and treat them accordingly
-    .then(handleResults)
+    .then(getCheapestTrips)
 }
 
 // if run from the command line...
 if (!module.parent) {
   work()
-    .then(ids => {
+    // save all trip data for which we found matching results
+    .then(results => SearchResult.collection.insert(results.filter(r => r)))
+    // print out for stats
+    .then(writeResult => {
       debug(`All done!`)
-      debug(`Saved ${ids.filter(i => i).length} new results`)
+      debug(`Saved ${writeResult.insertedCount} new results`)
       process.exit(0)
     })
     .catch(err => {

@@ -67,9 +67,18 @@ function handleResults (responses) {
     .map(({ trip, response }) => {
       // save each returned result
       const quotes = response.Quotes
-      const cheapest = quotes.sort((a, b) => a.MinPrice > b.MinPrice)[0]
       const currency = response.Currencies[0].Code
       const places = {}
+
+      const cheapest = quotes
+        .filter(quote => quote.OutboundLeg) // take only non-return journeys
+        .filter(quote => new Date(quote.OutboundLeg.DepartureDate).getTime() >= trip.startDate.getTime())
+        .filter(quote => trip.endDate
+          ? new Date(quote.OutboundLeg.DepartureDate).getTime() <= trip.endDate.getTime()
+          : true
+        ) // TODO: Subtract duration of trip if there is any
+        .sort((a, b) => a.MinPrice > b.MinPrice)[0]
+
       response.Places.forEach(place => { places[place.PlaceId] = place })
 
       if (cheapest) {

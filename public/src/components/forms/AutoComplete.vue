@@ -1,17 +1,48 @@
 <template lang="html">
-  <div class="autocomplete autocomplete--wrapper">
-    <input type="text" class="autocomplete autocomplete--query"  @input="fetchSuggestions">
-    <ul class="autocomplete autocomplete--results">
-      <li v-for="suggestion in suggestions"><a :suggestion="suggestion" @click="pickSuggestion(suggestion)">{{suggestion | humanReadable}}</a></li>
-    </ul>
-  </div>
+    <p :class="{
+      'autocomplete': true,
+      'autocomplete--wrapper': true,
+      'control': true,
+      'is-loading': isLoading }">
+      <input
+        type="text"
+        class="input autocomplete autocomplete--query"
+        autocomplete="off"
+        v-model="query"
+        @input="fetchSuggestions($event.target.value)"
+        @click="isVisible = true"
+        @blur="isVisible = false"
+        @keydown.esc="isVisible = false"
+        @keydown.down="onDownArrow"
+        @keydown.up="onUpArrow"
+        @keydown.enter.prevent="chooseSuggestion(highlighted)">
+      <ul class="autocomplete autocomplete--results" v-show="isVisible">
+        <li
+          v-for="(suggestion, index) in suggestions"
+          :class="{ 'highlighted': index === highlighted }"
+          @mouseenter="highlighted = index"
+          @click="chooseSuggestion(index)">
+          <a :suggestion="suggestion">{{index}} {{suggestion | humanReadable}}</a>
+        </li>
+      </ul>
+    </p>
 </template>
 
 <script>
 /* eslint-env browser */
+function mapzenURL (query) {
+  query = encodeURIComponent(query)
+  return `https://search.mapzen.com/v1/autocomplete?api_key=${process.env.MAPZEN_API_KEY}&text=${query}`
+}
+
+function humanReadable (suggestion) {
+  const { properties } = suggestion
+  return `${properties.name}, ${properties.region}, ${properties.country}`.replace(/undefined, /g, '')
+}
+
 /**
  * TODO:
- * - Fetch suggestion
+ * - Make this configurable like vue-flatpickr (classes etc, so it's just like an input element)
  * - Handle response
  * - Configure endpoint via property
  * - Configure response parser via property
@@ -19,29 +50,49 @@
 export default {
   data () {
     return {
-      pick: null,
+      isLoading: false,
+      isVisible: false,
+      highlighted: -1,
+      query: '',
       suggestions: []
     }
   },
   methods: {
-    fetchSuggestions (e) {
-      const query = encodeURIComponent(e.target.value)
-      fetch(`https://search.mapzen.com/v1/autocomplete?api_key=${process.env.MAPZEN_API_KEY}&text=${query}`)
+    fetchSuggestions (term) {
+      this.isLoading = true
+      fetch(mapzenURL(term))
+        .then(res => { this.isLoading = false; return res })
         .then(res => res.json())
-        .then(res => this.suggestions = res.features)
+        .then(res => {
+          this.isVisible = true
+          this.suggestions = res.features
+        })
         .catch(err => console.error(err))
     },
-    pickSuggestion (suggestion) {
-      this.pick = suggestion
-      this.suggestions = []
+    chooseSuggestion (index) {
+      const query = this.suggestions[index]
+      console.log(index, humanReadable(query))
+      this.isVisible = false
+      this.query = query ? humanReadable(query) : ''
+    },
+
+    // handle keyboard navigation:
+    onDownArrow () {
+      // open menu on first keydown
+      if (!this.isVisible) {
+        this.isVisible = true
+        return
+      }
+      this.highlighted = Math.min(this.highlighted + 1, this.suggestions.length)
+    },
+    onUpArrow () {
+      // only act when menu is visible
+      if (this.isVisible) {
+        this.highlighted = Math.max(this.highlighted - 1, -1)
+      }
     }
   },
-  filters: {
-    humanReadable (suggestion) {
-      const { properties } = suggestion
-      return `${properties.name}, ${properties.region}, ${properties.country}`.replace(/undefined, /g, '')
-    }
-  }
+  filters: { humanReadable }
 }
 </script>
 
@@ -77,7 +128,7 @@ export default {
     padding: .6em;
   }
 
-  .autocomplete--results a:hover {
+  .autocomplete--results .highlighted a {
     background: #eee;
   }
 </style>

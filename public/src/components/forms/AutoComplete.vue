@@ -21,9 +21,8 @@
         <li
           v-for="(suggestion, index) in suggestions"
           :class="{ 'highlighted': index === highlighted }"
-          @mouseenter="highlighted = index"
-          @click="chooseSuggestion(index)">
-          <a>{{suggestion | humanReadable}}</a>
+          @mouseenter="highlighted = index">
+          <a @click="chooseSuggestion(index)">{{suggestion | humanReadable}}</a>
         </li>
       </ul>
     </p>
@@ -31,6 +30,8 @@
 
 <script>
 /* eslint-env browser */
+import humanReadable from '../../utils/human-readable-feature'
+
 function mapzenURL (term) {
   const query = encodeURIComponent(term)
   const layers = [
@@ -42,11 +43,6 @@ function mapzenURL (term) {
     'locality'
   ]
   return `https://search.mapzen.com/v1/autocomplete?api_key=${process.env.MAPZEN_API_KEY}&layers=${layers.join(',')}&text=${query}`
-}
-
-function humanReadable (suggestion) {
-  const { properties } = suggestion
-  return `${properties.name ? properties.name : properties.region}, ${properties.country}`.replace(/undefined, /g, '')
 }
 
 /**
@@ -82,9 +78,10 @@ export default {
         .catch(err => console.error(err))
     },
     chooseSuggestion (index) {
-      const query = this.suggestions[index]
+      this.choice = this.suggestions[index]
       this.isVisible = false
-      this.query = query ? humanReadable(query) : ''
+      this.query = this.choice ? humanReadable(this.choice) : ''
+      this.$emit('select', this.choice)
     },
 
     // handle keyboard navigation:
@@ -102,9 +99,6 @@ export default {
         this.highlighted = Math.max(this.highlighted - 1, -1)
       }
     }
-  },
-  computed: {
-    value () { return this.query }
   },
   filters: { humanReadable }
 }

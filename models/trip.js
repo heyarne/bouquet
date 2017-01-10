@@ -8,9 +8,9 @@ const tripSchema = new mongoose.Schema({
     required: true
   },
   // Airport for departure
-  departure: { type: String, required: true },
+  departure: { type: Object }, // actually type: feature
   // Airport for destination
-  destination: { type: String, required: true },
+  destination: { type: Object }, // see above
   // Start of search
   startDate: { type: Date, required: true, index: true },
   // End of search

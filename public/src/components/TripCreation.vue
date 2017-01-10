@@ -8,27 +8,19 @@
       None of this is going to be shared or published, no worries.
     </p>
     <hr>
-    <form method="post" @submit.prevent="handleSubmit">
+    <form method="post" @submit.prevent="onSubmit">
       <h2 class="subtitle">Tell us about the journey&hellip;</h2>
       <div class="columns">
         <div class="column">
           <p class="control">
             <label class="label">Place of departure:</label>
-            <input class="input" type="text" name="from" placeholder="Please enter a place..." v-model="trip.departure">
+            <auto-complete name="from" placeholder="Please enter a place..." @select="onSelectDeparture" />
           </p>
         </div>
         <div class="column">
           <p class="control">
             <label class="label">Destination:</label>
-            <input class="input" type="text" name="to" placeholder="Please enter a place..." v-model="trip.destination">
-          </p>
-        </div>
-      </div>
-      <div class="columns">
-        <div class="column">
-          <p class="control">
-            <label class="label">Place of departure:</label>
-            <auto-complete placeholder="Please enter a place..." />
+            <auto-complete name="from" placeholder="Please enter a place..." @select="onSelectDestination" />
           </p>
         </div>
       </div>
@@ -37,15 +29,14 @@
         <div class="column">
           <p class="control">
             <label class="label">Earliest start:</label>
-            <flatpickr class="input" name="availability-start" placeholder="Please enter a date..." v-model="trip.startDate" :options="config.datePicker" />
+            <flatpickr class="input" name="availability-start" placeholder="Please enter a date..." v-model="startDate" :options="config.datePicker" />
           </p>
         </div>
         <div class="column">
           <p class="control">
             <label class="label">Latest date of return:*</label>
-            <flatpickr class="input" name="availability-end" placeholder="Please enter a date..." v-model="trip.endDate" :options="config.datePicker" />
+            <flatpickr class="input" name="availability-end" placeholder="Please enter a date..." v-model="endDate" :options="config.datePicker" />
             <span class="help">* Optional</span>
-            <!-- TODO: Add additional timeframes -->
           </p>
         </div>
       </div>
@@ -54,7 +45,7 @@
         <div class="column is-half">
           <p class="control">
             <label class="label">Maximum trip duration in days:*</label>
-            <input class="input" type="text" name="duration" v-model="trip.duration">
+            <input class="input" type="text" name="duration" v-model="duration">
             <span class="help">* Optional</span>
           </p>
         </div>
@@ -82,13 +73,11 @@ export default {
   components: { Flatpickr, AutoComplete },
   data () {
     return {
-      trip: {
-        departure: null,
-        destination: null,
-        startDate: null,
-        endDate: null,
-        openEnd: null
-      },
+      departure: null,
+      destination: null,
+      startDate: null,
+      endDate: null,
+      duration: null,
       config: {
         datePicker: {
           minDate: 'today',
@@ -98,10 +87,14 @@ export default {
     }
   },
   methods: {
-    handleSubmit () {
-      const trip = this.trip
-      trip.startDate = new Date(trip.startDate).toJSON()
-      trip.endDate = trip.endDate ? new Date(trip.endDate).toJSON() : null
+    onSubmit () {
+      const trip = {
+        departure: this.departure,
+        destination: this.destination,
+        startDate: new Date(this.startDate).toJSON(),
+        endDate: this.endDate ? new Date(this.endDate).toJSON() : null,
+        duration: this.duration
+      }
 
       this.$http.post('trips', trip)
         .then(res => res.json())
@@ -114,6 +107,12 @@ export default {
         .catch(err => eventBus.$emit('notification', {
           type: 'error', message: err.body.message
         }))
+    },
+    onSelectDeparture (place) {
+      this.departure = place
+    },
+    onSelectDestination (place) {
+      this.destination = place
     }
   }
 }

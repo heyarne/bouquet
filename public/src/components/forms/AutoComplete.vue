@@ -9,6 +9,7 @@
         class="input autocomplete autocomplete--query"
         autocomplete="off"
         v-model="query"
+        :placeholder="placeholder"
         @input="fetchSuggestions($event.target.value)"
         @click="isVisible = true"
         @blur="isVisible = false"
@@ -22,7 +23,7 @@
           :class="{ 'highlighted': index === highlighted }"
           @mouseenter="highlighted = index"
           @click="chooseSuggestion(index)">
-          <a :suggestion="suggestion">{{index}} {{suggestion | humanReadable}}</a>
+          <a>{{suggestion | humanReadable}}</a>
         </li>
       </ul>
     </p>
@@ -30,14 +31,22 @@
 
 <script>
 /* eslint-env browser */
-function mapzenURL (query) {
-  query = encodeURIComponent(query)
-  return `https://search.mapzen.com/v1/autocomplete?api_key=${process.env.MAPZEN_API_KEY}&text=${query}`
+function mapzenURL (term) {
+  const query = encodeURIComponent(term)
+  const layers = [
+    'country',
+    'macroregion',
+    'region',
+    'macrocounty',
+    'county',
+    'locality'
+  ]
+  return `https://search.mapzen.com/v1/autocomplete?api_key=${process.env.MAPZEN_API_KEY}&layers=${layers.join(',')}&text=${query}`
 }
 
 function humanReadable (suggestion) {
   const { properties } = suggestion
-  return `${properties.name}, ${properties.region}, ${properties.country}`.replace(/undefined, /g, '')
+  return `${properties.name ? properties.name : properties.region}, ${properties.country}`.replace(/undefined, /g, '')
 }
 
 /**
@@ -48,6 +57,7 @@ function humanReadable (suggestion) {
  * - Configure response parser via property
  */
 export default {
+  props: [ 'placeholder' ],
   data () {
     return {
       isLoading: false,
@@ -59,6 +69,8 @@ export default {
   },
   methods: {
     fetchSuggestions (term) {
+      if (!term) return // save unnecessary api requests
+
       this.isLoading = true
       fetch(mapzenURL(term))
         .then(res => { this.isLoading = false; return res })
@@ -71,7 +83,6 @@ export default {
     },
     chooseSuggestion (index) {
       const query = this.suggestions[index]
-      console.log(index, humanReadable(query))
       this.isVisible = false
       this.query = query ? humanReadable(query) : ''
     },
@@ -92,14 +103,15 @@ export default {
       }
     }
   },
+  computed: {
+    value () { return this.query }
+  },
   filters: { humanReadable }
 }
 </script>
 
 <style scoped>
-  /* TODO: Styling */
   .autocomplete--wrapper {
-    display: inline-block;
     position: relative;
   }
 

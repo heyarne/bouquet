@@ -28,7 +28,7 @@
         <div class="column">
           <p class="control">
             <label class="label">Place of departure:</label>
-            <auto-complete />
+            <auto-complete placeholder="Please enter a place..." />
           </p>
         </div>
       </div>

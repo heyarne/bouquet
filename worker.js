@@ -93,6 +93,7 @@ function cheapestFromQuotes (response, trip) {
         platformIdentifier: places[cheapest.OutboundLeg.DestinationId].SkyscannerCode
       },
       platform: 'skyscanner',
+      quoteDate: cheapest.QuoteDateTime,
       price: cheapest.MinPrice,
       currency
     }
@@ -108,7 +109,8 @@ function cheapestFromGrid (response, trip) {
       row.slice(1).map((date, i) => date && {
         'departure': departures[i].DateString,
         'return': date.DateString,
-        'price': date.MinPrice
+        'price': date.MinPrice,
+        'quoteDate': date.QuoteDateTime
       })
     )
     // flatten the array
@@ -134,6 +136,7 @@ function cheapestFromGrid (response, trip) {
         platformIdentifier: 'TODO'
       },
       platform: 'skyscanner',
+      quoteDate: cheapest.quoteDate,
       price: cheapest.price,
       currency
     }

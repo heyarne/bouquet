@@ -25,7 +25,8 @@ const searchResultSchema = new mongoose.Schema({
   platform: { type: String, required: true },
   // how much does it cost?
   price: { type: Number, required: true },
-  currency: { type: String, required: true }
+  currency: { type: String, required: true },
+  quoteDate: Date
 })
 
 const SearchResult = mongoose.model('SearchResult', searchResultSchema)

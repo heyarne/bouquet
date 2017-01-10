@@ -1,9 +1,4 @@
 const mongoose = require('mongoose')
-const Trip = {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: 'Trip',
-  required: true
-}
 
 const Place = {
   // human-readable name
@@ -14,7 +9,12 @@ const Place = {
 
 const searchResultSchema = new mongoose.Schema({
   // which one is the trip that caused this search?
-  trip: Trip,
+  trip: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Trip',
+    required: true,
+    index: true
+  },
   // when can we go?
   date: { type: Date, required: true },
   // where do we go from?

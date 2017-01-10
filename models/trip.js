@@ -12,16 +12,17 @@ const tripSchema = new mongoose.Schema({
   // Airport for destination
   destination: { type: String, required: true },
   // Start of search
-  startDate: { type: Date, required: true },
+  startDate: { type: Date, required: true, index: true },
   // End of search
-  endDate: { type: Date },
+  endDate: { type: Date, index: true },
   // Duration of trip
   duration: { type: Object },
   // should it be searched for at the moment?
   active: {
     type: Boolean,
     required: true,
-    default: true
+    default: true,
+    index: true
   }
 })
 

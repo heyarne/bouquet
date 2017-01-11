@@ -10,7 +10,7 @@
         autocomplete="off"
         v-model="query"
         :placeholder="placeholder"
-        @input="fetchSuggestions($event.target.value)"
+        @input="onInput($event.target.value)"
         @click="isVisible = true"
         @blur="isVisible = false"
         @keydown.esc="isVisible = false"
@@ -60,13 +60,27 @@ export default {
       isVisible: false,
       highlighted: -1,
       query: '',
+      choice: null,
       suggestions: []
     }
   },
   methods: {
-    fetchSuggestions (term) {
+    chooseSuggestion (index) {
+      this.choice = this.suggestions[index]
+      this.isVisible = false
+      this.query = this.choice ? humanReadable(this.choice) : ''
+      this.$emit('select', this.choice)
+    },
+
+    // handle search term input:
+    onInput (term) {
+      // reset the choice
+      this.choice = undefined
+      this.$emit('select', undefined)
+
       if (!term) return // save unnecessary api requests
 
+      // get new suggestions
       this.isLoading = true
       fetch(mapzenURL(term))
         .then(res => { this.isLoading = false; return res })
@@ -76,12 +90,6 @@ export default {
           this.suggestions = res.features
         })
         .catch(err => console.error(err))
-    },
-    chooseSuggestion (index) {
-      this.choice = this.suggestions[index]
-      this.isVisible = false
-      this.query = this.choice ? humanReadable(this.choice) : ''
-      this.$emit('select', this.choice)
     },
 
     // handle keyboard navigation:

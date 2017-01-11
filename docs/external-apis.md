@@ -4,6 +4,466 @@ This file is meant to be a quick reference for working with external APIs. You
 will find what errors and succesfull responses look like, as well as links
 to the official docs or additional useful information.
 
+## Overpas
+
+This is currently used to search for airports in a bounding box.
+
+URL: http://overpass-api.de/api/interpreter?data=$osmQuery`
+`osmQuery`:
+```
+[out:json];
+node
+    (${swLat},${swLon},${neLat},${neLon})
+    [aeroway=aerodrome]
+    [iata];
+out;
+```
+Example response (for the bbox of France, `(41.365694,-5.132188,51.087167,9.560119)`):
+``` json
+{
+
+    "version": 0.6,
+    "generator": "Overpass API",
+    "osm3s": {
+        "timestamp_osm_base": "2017-01-11T15:54:02Z",
+        "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+    },
+    "elements": [
+        {
+            "type": "node",
+            "id": 26608804,
+            "lat": 43.4370545,
+            "lon": 5.2168293,
+            "tags": {
+                "aerodrome": "international",
+                "aerodrome:type": "civil",
+                "aeroway": "aerodrome",
+                "iata": "MRS",
+                "icao": "LFML",
+                "name": "Aéroport de Marseille Provence",
+                "old_name": "Aéroport de Marseille Marignane",
+                "source": "Gagravarr_Airports",
+                "website": "http://www.marseille.aeroport.fr/",
+                "wikipedia": "fr:Aéroport Marseille Provence"
+            }
+        },
+        {
+            "type": "node",
+            "id": 26608880,
+            "lat": 47.4582802,
+            "lon": 8.5481780,
+            "tags": {
+                "aerodrome": "international",
+                "aeroway": "aerodrome",
+                "ele": "432",
+                "iata": "ZRH",
+                "icao": "LSZH",
+                "is_in": "Zürich",
+                "name": "Flughafen Zürich",
+                "name:ar": "مطار زيورخ الدولي",
+                "name:ca": "Aeroport de Zuric",
+                "name:cs": "Letiště Zürich",
+                "name:da": "Zürich Lufthavn",
+                "name:de": "Flughafen Zürich",
+                "name:en": "Zürich Airport",
+                "name:eo": "Flughaveno Zuriko",
+                "name:es": "Aeropuerto Internacional de Zúrich",
+                "name:et": "Zürichi lennujaam",
+                "name:eu": "Züricheko aireportua",
+                "name:fa": "فرودگاه زوریخ",
+                "name:fi": "Zürichin kansainvälinen lentoasema",
+                "name:fr": "Aéroport international de Zurich",
+                "name:gl": "Aeroporto de Zúric",
+                "name:he": "נמל התעופה הבינלאומי ציריך קלוטן",
+                "name:hr": "Zračna luka Zürich",
+                "name:hu": "Zürichi repülőtér",
+                "name:id": "Bandar Udara Internasional Zürich",
+                "name:it": "Aeroporto di Zurigo",
+                "name:ja": "チューリッヒ空港",
+                "name:ko": "취리히 공항",
+                "name:lt": "Ciuricho oro uostas",
+                "name:mk": "Аеродром Цирих",
+                "name:ms": "Lapangan Terbang Zurich",
+                "name:nl": "Luchthaven Zürich",
+                "name:pl": "Port lotniczy Zurych-Kloten",
+                "name:pt": "Aeroporto de Zurique",
+                "name:rm": "Eroport Internaziunal da Turitg-Kloten",
+                "name:sk": "Letisko Zürich",
+                "name:sr": "Аеродром Цирих",
+                "name:sv": "Zürich flygplats",
+                "name:tr": "Zürih Havalimanı",
+                "name:vi": "Sân bay Zürich",
+                "name:zh": "蘇黎世機場",
+                "operator": "Flughafen Zürich AG",
+                "passengers": "24000000",
+                "ref": "ZRH",
+                "source": "wikipedia",
+                "type": "Public",
+                "website": "http://www.zurich-airport.com/",
+                "wikipedia": "en:Zürich Airport"
+            }
+        },
+        {
+            "type": "node",
+            "id": 60647148,
+            "lat": 47.4859603,
+            "lon": 9.5598603,
+            "tags": {
+                "aerodrome": "regional",
+                "aerodrome:type": "private",
+                "aeroway": "aerodrome",
+                "ele": "398",
+                "iata": "ACH",
+                "icao": "LSZR",
+                "name": "Business Airport St.Gallen - Altenrhein",
+                "passengers": "80000",
+                "ref": "ACH",
+                "wikipedia": "en:St. Gallen–Altenrhein Airport"
+            }
+        },
+        {
+            "type": "node",
+            "id": 262226957,
+            "lat": 44.5433782,
+            "lon": 7.6192896,
+            "tags": {
+                "aeroway": "aerodrome",
+                "iata": "CUF",
+                "icao": "LIMZ",
+                "name": "Aeroporto Cuneo Levaldigi",
+                "wikipedia": "it:Aeroporto di Cuneo-Levaldigi"
+            }
+        },
+        {
+            "type": "node",
+            "id": 276401991,
+            "lat": 46.9127475,
+            "lon": 7.5007669,
+            "tags": {
+                "addr:city": "Belp",
+                "addr:country": "CH",
+                "addr:postcode": "3123",
+                "addr:street": "Flugplatzstrasse",
+                "aerodrome": "regional",
+                "aeroway": "aerodrome",
+                "alt_name": "Flughafen Belpmoos",
+                "iata": "BRN",
+                "icao": "LSZB",
+                "name": "Flughafen Bern-Belp",
+                "name:en": "Bern Airport",
+                "name:fr": "Aéroport Berne",
+                "name:it": "Aeroporto Berna",
+                "operator": "ALPAR Flug- und Flugplatzgesellschaft AG",
+                "passengers": "200000",
+                "website": "http://www.flughafenbern.ch",
+                "wikidata": "Q619845",
+                "wikipedia": "it:Aeroporto di Berna",
+                "wikipedia:fr": "Aéroport international de Berne"
+            }
+        },
+        {
+            "type": "node",
+            "id": 305447281,
+            "lat": 47.6813309,
+            "lon": 9.1397524,
+            "tags": {
+                "aeroway": "aerodrome",
+                "ele": "397",
+                "iata": "QKZ",
+                "icao": "EDTZ",
+                "name": "Flugplatz Konstanz",
+                "name:de": "Flugplatz Konstanz",
+                "name:en": "Airport Constance",
+                "operator": "Flughafengesellschaft Konstanz GmbH",
+                "ref": "EDTZ",
+                "wikidata": "Q1433674",
+                "wikipedia": "de:Flugplatz Konstanz"
+            }
+        },
+        {
+            "type": "node",
+            "id": 321522576,
+            "lat": 46.0016489,
+            "lon": 8.9066263,
+            "tags": {
+                "aerodrome": "regional",
+                "aerodrome:type": "public",
+                "aeroway": "aerodrome",
+                "ele": "279",
+                "iata": "LUG",
+                "icao": "LSZA",
+                "name": "Lugano Airport",
+                "passengers": "175000",
+                "wheelchair": "yes",
+                "wikipedia": "en:Lugano Airport"
+            }
+        },
+        {
+            "type": "node",
+            "id": 408652352,
+            "lat": 45.9200203,
+            "lon": 4.6331943,
+            "tags": {
+                "aerodrome:type": "public",
+                "aeroway": "aerodrome",
+                "alt_name": "Aéroport de Villefranche - Tarare",
+                "closest_town": "Villefranche-sur-Saône",
+                "ele": "328",
+                "iata": "XVF",
+                "icao": "LFHV",
+                "name": "Aérodrome de Villefranche - Tarare",
+                "name:en": "Villefranche - Tarare Airport",
+                "operator": "CCI de Villefranche",
+                "source": "wikipedia",
+                "wikipedia": "fr:Aérodrome de Villefranche - Tarare"
+            }
+        },
+        {
+            "type": "node",
+            "id": 412055604,
+            "lat": 46.2369000,
+            "lon": 6.1089000,
+            "tags": {
+                "aerodrome": "continental",
+                "aerodrome:type": "public",
+                "aeroway": "aerodrome",
+                "city_served": "Geneva",
+                "ele": "430",
+                "iata": "GVA",
+                "icao": "LSGG",
+                "name": "Geneva International Airport",
+                "name:en": "Geneva International Airport",
+                "name:fr": "Aéroport international de Genève",
+                "passengers": "13000000",
+                "source": "wikipedia",
+                "wikipedia": "fr:Aéroport international de Genève"
+            }
+        },
+        {
+            "type": "node",
+            "id": 416348918,
+            "lat": 46.9596331,
+            "lon": 6.8663659,
+            "tags": {
+                "aeroway": "aerodrome",
+                "ele": "435",
+                "email": "info@neuchatel-airport.ch",
+                "fax": "+41 32 841 31 65",
+                "iata": "QNC",
+                "icao": "LSGN",
+                "name": "Neuchâtel-Colombier airport",
+                "name:fr": "Aéroport de Neuchâtel",
+                "phone": "+41 32 841 31 55",
+                "source": "Orthophotos2006sitn50cm",
+                "type": "public",
+                "website": "http://www.neuchatel-airport.ch",
+                "wikipedia": "fr:Aéroport de Neuchâtel"
+            }
+        },
+        {
+            "type": "node",
+            "id": 824930133,
+            "lat": 45.4063442,
+            "lon": 6.5786258,
+            "tags": {
+                "aeroway": "aerodrome",
+                "iata": "MFX",
+                "icao": "LFKX",
+                "name": "Altiport de Méribel",
+                "wikipedia": "fr:Altiport de Méribel"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1042046471,
+            "lat": 42.3411580,
+            "lon": 1.4107327,
+            "tags": {
+                "aeroway": "aerodrome",
+                "alt_name": "Aeroport Andorra - La Seu",
+                "iata": "LEU",
+                "icao": "LESU",
+                "name": "Aeroport de Pirineus-Andorra",
+                "name:en": "Pirineus-La Seu d'Urgell Airport",
+                "source": "ourairports.com"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1042046744,
+            "lat": 49.0287018,
+            "lon": 1.2198600,
+            "tags": {
+                "aeroway": "aerodrome",
+                "iata": "EVX",
+                "name": "Évreux-Fauville (BA 105) Air Base",
+                "source": "ourairports.com"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1042046763,
+            "lat": 49.2533407,
+            "lon": 2.5192498,
+            "tags": {
+                "aerodrome:type": "military",
+                "aeroway": "aerodrome",
+                "ele": "89",
+                "iata": "CSF",
+                "icao": "LFPC",
+                "name": "Base aérienne 110 de Creil",
+                "name:en": "Creil Air Base",
+                "source": "ourairports.com",
+                "website": "http://www.ba110.air.defense.gouv.fr",
+                "wikipedia": "fr:Base aérienne 110 Creil"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1042047732,
+            "lat": 46.6766014,
+            "lon": 7.8790798,
+            "tags": {
+                "aeroway": "aerodrome",
+                "iata": "ZIN",
+                "name": "Interlaken Air Base",
+                "source": "ourairports.com"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1042047747,
+            "lat": 46.9744444,
+            "lon": 8.3969444,
+            "tags": {
+                "aeroway": "aerodrome",
+                "iata": "BXO",
+                "icao": "LSZC",
+                "name": "Flugplatz Buochs",
+                "name:de": "Flugplatz Buochs",
+                "name:en": "Buochs Airport",
+                "source": "ourairports.com"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1123465496,
+            "lat": 43.9168212,
+            "lon": 2.1173286,
+            "tags": {
+                "aeroway": "aerodrome",
+                "iata": "LBI",
+                "icao": "LFCI",
+                "name": "Aéroport Albi",
+                "operator": "Syndicat Mixte de l'aérodrome d'Albi"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1529797748,
+            "lat": 49.7842885,
+            "lon": 4.6457893,
+            "tags": {
+                "aeroway": "aerodrome",
+                "iata": "XCZ",
+                "icao": "LFQV",
+                "name": "Aéroport de Charleville-Mézières - Belval",
+                "operator": "Conseil général des Ardennes",
+                "source": "http://www.ourairports.com/airports/LFQV/pilot-info.html",
+                "wikipedia": "fr:Aéroport de Charleville-Mézières - Belval"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1819292994,
+            "lat": 47.5623490,
+            "lon": -0.3137632,
+            "tags": {
+                "aeroway": "aerodrome",
+                "iata": "ANE",
+                "icao": "LFJR",
+                "name": "Aéroport Angers Marcé",
+                "ref": "LFJR",
+                "wikipedia": "fr:Angers Loire Aéroport"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1948968916,
+            "lat": 46.2230062,
+            "lon": 2.3627478,
+            "tags": {
+                "CLC:code": "124",
+                "CLC:id": "FR-134173",
+                "CLC:year": "2006",
+                "aeroway": "aerodrome",
+                "iata": "MCU",
+                "icao": "LFBK",
+                "name": "Aéroport de Montluçon - Guéret",
+                "source": "Union européenne - SOeS, CORINE Land Cover, 2006."
+            }
+        },
+        {
+            "type": "node",
+            "id": 2024849609,
+            "lat": 44.4075000,
+            "lon": 2.4833333,
+            "tags": {
+                "aeroway": "aerodrome",
+                "iata": "RDZ",
+                "icao": "LFCR",
+                "name": "Aéroport Rodez Marcillac",
+                "operator": "Chambre du Commerce et d'Industrie de Rodez",
+                "type": "public",
+                "wikipedia": "fr:Aéroport de Rodez-Aveyron"
+            }
+        },
+        {
+            "type": "node",
+            "id": 2621223666,
+            "lat": 50.7805754,
+            "lon": -1.8390118,
+            "tags": {
+                "aeroway": "aerodrome",
+                "iata": "BOH",
+                "icao": "EGHH",
+                "name": "Bournemouth Airport"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3554808116,
+            "lat": 50.7077183,
+            "lon": 8.0832824,
+            "tags": {
+                "aeroway": "aerodrome",
+                "ele": "600",
+                "iata": "SGE",
+                "icao": "EDGS",
+                "name": "Siegerlandflughafen",
+                "passengers": "32070",
+                "wikipedia": "de:Siegerlandflughafen"
+            }
+        }
+    ]
+
+}
+```
+Example response if no nodes are found:
+``` json
+{
+
+    "version": 0.6,
+    "generator": "Overpass API",
+    "osm3s": {
+        "timestamp_osm_base": "2017-01-11T15:48:02Z",
+        "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+    },
+    "elements": [ ]
+
+}
+```
+
 ## Skyscanner
 
 ### Fetching quotes

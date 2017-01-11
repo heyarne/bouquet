@@ -5,6 +5,5 @@
  * @return {String}
  */
 export default function (feature) {
-  const { properties } = feature
-  return `${properties.name ? properties.name : properties.region}, ${properties.country}`.replace(/undefined, /g, '')
+  return feature.properties.label
 }

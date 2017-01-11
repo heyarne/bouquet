@@ -15,6 +15,7 @@ const fetch = require('node-fetch')
 const debug = require('debug')('bouquet:worker')
 const mongoose = require('mongoose')
 const moment = require('moment')
+const _ = require('lodash')
 
 mongoose.Promise = global.Promise
 mongoose.connect(MONGODB_URI, _ => console.log(`Mongoose connected to ${MONGODB_URI}`))
@@ -27,6 +28,37 @@ function toSkyScannerDate (date) {
   return `${date.getFullYear()}-${month}`
 }
 
+/**
+ * Returns an array of IATA codes for all airports in a location's bounding box
+ * @return {String[]}
+ */
+function getAirports ({ bbox, properties }) {
+  if (bbox == null) {
+    return Promise.reject(
+      new Error(`Location '${properties.label}' is missing a bounding box`)
+    )
+  }
+
+  const [ swLon, swLat, neLon, neLat ] = bbox
+  const osmQuery = `
+  [out:json];
+  node
+    (${swLat},${swLon},${neLat},${neLon})
+    [aeroway=aerodrome]
+    [iata];
+  out;
+  `.replace(/\s+/g, '')
+  const url = `http://overpass-api.de/api/interpreter?data=${encodeURIComponent(osmQuery)}`
+
+  debug(`Requesting airports for ${properties.label}`)
+  return fetch(url)
+    .then(res => res.ok ? res.json() : Promise.reject([res.status, res.json()]))
+    .then(res => res.elements.map(node => node.tags.iata))
+    .catch(([status, err]) => err.then(
+      debug(`Couldn't fetch airport for ${properties.label}\nStatus: ${status}\n${util.inspect(err)}`)
+    ))
+}
+
 function convertDates (...dates) {
   return dates
     .filter(date => date != null) // we don't necessarily have an endDate
@@ -34,34 +66,57 @@ function convertDates (...dates) {
     .join('/')
 }
 
-function skyScannerURL (trip) {
+function skyScannerURL (trip, [ departure, destination ]) {
   const market = 'DE'
   const currency = 'EUR'
   const locale = 'en'
-  const { departure, destination, startDate, endDate } = trip
+  const { startDate, endDate } = trip
   const service = endDate ? 'browsegrid' : 'browsequotes'
 
   return `http://partners.api.skyscanner.net/apiservices/${service}/v1.0/${market}/${currency}/${locale}/${departure}/${destination}/${convertDates(startDate, endDate)}?apiKey=${SKYSCANNER_API_KEY}`
 }
 
 function searchSkyScanner (trip) {
-  const url = skyScannerURL(trip)
+  return Promise.all([ getAirports(trip.departure), getAirports(trip.destination) ])
+    .then(([ departure, destination ]) => {
+      if (!(departure.length && destination.length)) {
+        const missing = departure.length < destination.length ? 'departure' : (destination.length < departure.length ? 'destination' : 'both')
+        return Promise.reject(new Error(`No airport found: ${trip._id} ${missing}`))
+      }
 
-  debug(`Requesting ${url}`)
-  return fetch(url)
-    // check the responses and reject the bad ones
-    .then(res => Promise[res.ok ? 'resolve' : 'reject'](res.json()))
-    // continue working with this result if everything's fine
-    .then(response => Promise.resolve({ trip, response }))
-    // if we have an error, resolve it and print it. we don't want it to stop
-    // further processing though, so we catch it early
-    .catch(err =>
-      err.then(err => {
-        console.error(`Bad response for ${trip._id}`)
-        console.error(err)
-        debug(util.inspect(err))
-      })
-    )
+      // return all possible combinations of two arrays [ a, b, c ] and
+      // [ b, c, e ], except for the elements [ b, b ] and [ c, c ]
+      const combinations = departure
+        .map(dep =>
+          destination
+            .filter(des => des !== dep)
+            .map(des => [ dep, des ]))
+        .reduce((a, b) => a.concat(b))
+      debug(`Got ${combinations.length} combinations for ${trip._id}`)
+      return combinations
+    })
+    .then(combinations => Promise.all(combinations.map(combo => {
+      const url = skyScannerURL(trip, combo)
+      debug(`Requesting ${url}`)
+      return fetch(url)
+        // check the responses and reject the bad ones
+        .then(res => Promise[res.ok ? 'resolve' : 'reject'](res.json()))
+        // continue working with this result if everything's fine
+        .then(response => Promise.resolve({ trip, response }))
+        // if we have an error, resolve it and print it. we don't want it to stop
+        // further processing though, so we catch it early
+        .catch(err =>
+          err.then(err => {
+            console.error(`Bad response for ${trip._id}`)
+            console.error(err)
+            debug(util.inspect(err))
+          })
+        )
+    })))
+    // Handle the error if we can, if not pass it on
+    .catch(err => (err.message && err.message.match(/^No airport found:/))
+      ? debug(err.message)
+      : Promise.reject(err))
 }
 
 function cheapestFromQuotes (response, trip) {
@@ -182,10 +237,10 @@ function findCurrentResults () {
     .exec()
     // request trip data from skyscanner
     .then(trips => Promise.all(trips.map(searchSkyScanner)))
-    // filter out the requests that went wrong
-    .then(responses => Promise.resolve(responses.filter(res => res != null)))
-    // get the responses that went well and went not so well and treat them accordingly
-    .then(getCheapestTrips)
+    // // filter out the requests that went wrong
+    // .then(responses => Promise.resolve(responses.filter(res => res != null)))
+    // // get the responses that went well and went not so well and treat them accordingly
+    // .then(getCheapestTrips)
 }
 
 // if run from the command line...
@@ -193,7 +248,7 @@ if (!module.parent) {
   cleanupOldtrips()
     .then(findCurrentResults)
     // save all trip data for which we found matching results
-    .then(results => SearchResult.collection.insert(results.filter(r => r)))
+    // .then(results => SearchResult.collection.insert(results.filter(r => r)))
     // print out for stats
     .then(writeResult => {
       debug(`All done!`)

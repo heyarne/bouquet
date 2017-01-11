@@ -198,10 +198,6 @@ function findCurrentResults () {
     .then(trips => Promise.all(trips.map(searchSkyScanner)))
     // get cheapest result for each trip
     .then(results => results.map(getCheapestForTrip))
-    // filter out the requests that went wrong
-    .then(cheapest => console.log(cheapest))
-    // // get the responses that went well and went not so well and treat them accordingly
-    // .then(getCheapestTrips)
 }
 
 // if run from the command line...
@@ -209,7 +205,7 @@ if (!module.parent) {
   cleanupOldtrips()
     .then(findCurrentResults)
     // save all trip data for which we found matching results
-    // .then(results => SearchResult.collection.insert(results.filter(r => r) || []))
+    .then(results => SearchResult.collection.insert(results.filter(r => r) || []))
     // print out for stats
     .then(writeResult => {
       debug(`All done!`)

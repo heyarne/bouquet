@@ -15,7 +15,6 @@ const fetch = require('node-fetch')
 const debug = require('debug')('bouquet:worker')
 const mongoose = require('mongoose')
 const moment = require('moment')
-const _ = require('lodash')
 
 mongoose.Promise = global.Promise
 mongoose.connect(MONGODB_URI, _ => console.log(`Mongoose connected to ${MONGODB_URI}`))
@@ -28,37 +27,6 @@ function toSkyScannerDate (date) {
   return `${date.getFullYear()}-${month}`
 }
 
-/**
- * Returns an array of IATA codes for all airports in a location's bounding box
- * @return {String[]}
- */
-function getAirports ({ bbox, properties }) {
-  if (bbox == null) {
-    return Promise.reject(
-      new Error(`Location '${properties.label}' is missing a bounding box`)
-    )
-  }
-
-  const [ swLon, swLat, neLon, neLat ] = bbox
-  const osmQuery = `
-  [out:json];
-  node
-    (${swLat},${swLon},${neLat},${neLon})
-    [aeroway=aerodrome]
-    [iata];
-  out;
-  `.replace(/\s+/g, '')
-  const url = `http://overpass-api.de/api/interpreter?data=${encodeURIComponent(osmQuery)}`
-
-  debug(`Requesting airports for ${properties.label}`)
-  return fetch(url)
-    .then(res => res.ok ? res.json() : Promise.reject([res.status, res.json()]))
-    .then(res => res.elements.map(node => node.tags.iata))
-    .catch(([status, err]) => err.then(
-      debug(`Couldn't fetch airport for ${properties.label}\nStatus: ${status}\n${util.inspect(err)}`)
-    ))
-}
-
 function convertDates (...dates) {
   return dates
     .filter(date => date != null) // we don't necessarily have an endDate
@@ -66,60 +34,65 @@ function convertDates (...dates) {
     .join('/')
 }
 
-function skyScannerURL (trip, [ departure, destination ]) {
+function skyScannerTripURL (trip, [ departure, destination ]) {
   const market = 'DE'
   const currency = 'EUR'
   const locale = 'en'
   const { startDate, endDate } = trip
   const service = endDate ? 'browsegrid' : 'browsequotes'
 
-  return `http://partners.api.skyscanner.net/apiservices/${service}/v1.0/${market}/${currency}/${locale}/${departure}/${destination}/${convertDates(startDate, endDate)}?apiKey=${SKYSCANNER_API_KEY}`
+  return `http://partners.api.skyscanner.net/apiservices/${service}/v1.0/
+    ${market}/${currency}/${locale}/${departure}/
+    ${destination}/${convertDates(startDate, endDate)}
+    ?apiKey=${SKYSCANNER_API_KEY}`.replace(/\s+/g, '')
+}
+
+function skyScannerPlaceId ({ properties: {layer, label} }) {
+  const url = `http://partners.api.skyscanner.net/apiservices/autosuggest/v1.0/DE/EUR/en/
+    ?api_key=ar476997332973333998634946946081
+    &query=${encodeURIComponent(label)}`.replace(/\s+/g, '')
+  return fetch(url)
+    .then(res => res.json())
+    .then(body => {
+      if (!body.Places.length) return
+
+      // for "towns, hamlets, cities", return the first result
+      // for bigger areas, we need to return all finegrained results (e.g. countries are not supported for the grid)
+      const places = (layer === 'locality')
+        ? body.Places.slice(0, 1)
+        : body.Places.filter(place => place.CityId !== '-sky')
+
+      return places.map(p => p.PlaceId)
+    })
 }
 
 function searchSkyScanner (trip) {
-  return Promise.all([ getAirports(trip.departure), getAirports(trip.destination) ])
-    .then(([ departure, destination ]) => {
-      if (!(departure.length && destination.length)) {
-        const missing = departure.length < destination.length ? 'departure' : (destination.length < departure.length ? 'destination' : 'both')
-        return Promise.reject(new Error(`No airport found: ${trip._id} ${missing}`))
-      }
-
-      // return all possible combinations of two arrays [ a, b, c ] and
-      // [ b, c, e ], except for the elements [ b, b ] and [ c, c ]
-      const combinations = departure
-        .map(dep =>
-          destination
-            .filter(des => des !== dep)
-            .map(des => [ dep, des ]))
-        .reduce((a, b) => a.concat(b))
-      debug(`Got ${combinations.length} combinations for ${trip._id}`)
-      return combinations
-    })
+  return Promise.all([ skyScannerPlaceId(trip.departure), skyScannerPlaceId(trip.destination) ])
+    // combine [ a, b ] x [ b, c ] to [[ab], [ac], [bc]] so departure and arrival place is always different
+    .then(([as = [], bs = []]) =>
+      as.map(a =>
+        bs.filter(b => b !== a)
+          .map(b => [ a, b ])
+        ).reduce((a, b) => a.concat(b))) // flatten one level
     .then(combinations => Promise.all(combinations.map(combo => {
-      const url = skyScannerURL(trip, combo)
+      const url = skyScannerTripURL(trip, combo)
       debug(`Requesting ${url}`)
       return fetch(url)
         // check the responses and reject the bad ones
         .then(res => Promise[res.ok ? 'resolve' : 'reject'](res.json()))
         // continue working with this result if everything's fine
-        .then(response => Promise.resolve({ trip, response }))
+        .then(response => ({ trip, response, url }))
         // if we have an error, resolve it and print it. we don't want it to stop
         // further processing though, so we catch it early
-        .catch(err =>
-          err.then(err => {
-            console.error(`Bad response for ${trip._id}`)
-            console.error(err)
-            debug(util.inspect(err))
-          })
-        )
+        .catch(err => {
+          console.error(`Bad response for ${trip._id}`)
+          console.error(err)
+          debug(util.inspect(err))
+        })
     })))
-    // Handle the error if we can, if not pass it on
-    .catch(err => (err.message && err.message.match(/^No airport found:/))
-      ? debug(err.message)
-      : Promise.reject(err))
 }
 
-function cheapestFromQuotes (response, trip) {
+function cheapestFromQuotes ({response, trip, url}) {
   const quotes = response.Quotes
   const currency = response.Currencies[0].Code
   const places = {}
@@ -139,15 +112,8 @@ function cheapestFromQuotes (response, trip) {
     return {
       trip: trip._id,
       date: new Date(cheapest.OutboundLeg.DepartureDate),
-      departure: {
-        name: places[cheapest.OutboundLeg.OriginId].Name,
-        platformIdentifier: places[cheapest.OutboundLeg.OriginId].SkyscannerCode
-      },
-      destination: {
-        name: places[cheapest.OutboundLeg.DestinationId].Name,
-        platformIdentifier: places[cheapest.OutboundLeg.DestinationId].SkyscannerCode
-      },
       platform: 'skyscanner',
+      url: url.replace(/browse[^/]+/, 'referral'),
       quoteDate: cheapest.QuoteDateTime,
       price: cheapest.MinPrice,
       currency
@@ -155,7 +121,7 @@ function cheapestFromQuotes (response, trip) {
   }
 }
 
-function cheapestFromGrid (response, trip) {
+function cheapestFromGrid ({response, trip, url}) {
   const currency = response.Currencies[0].Code
   const departures = response.Dates[0].slice(1) // undefined, { DateString: ... }, { DateString: ... }
   const cheapest = response.Dates.slice(1) // { DateString: ... }, undefined, { MinPrice: ..., QuoteTime: ... }, ...
@@ -172,25 +138,15 @@ function cheapestFromGrid (response, trip) {
     .reduce((a, b) => a.concat(b))
     // filter out nulls
     .filter(r => r)
-    // sort by price
-    .sort((a, b) => a.price < b)[0]
+    // sort by price ascending
+    .sort((a, b) => a.price > b.price)[0]
 
   if (cheapest) {
     return {
       trip: trip._id,
       date: new Date(cheapest.departure),
-      // TODO: Think of a better way for depature name, or how to map the result back to the platform in order to link it
-      // There is no identifier or name for each and every result in the grid,
-      // just something like a summary.
-      departure: {
-        name: 'TODO',
-        platformIdentifier: 'TODO'
-      },
-      destination: {
-        name: 'TODO',
-        platformIdentifier: 'TODO'
-      },
       platform: 'skyscanner',
+      url: url.replace(/browse[^/]+/, 'referral'),
       quoteDate: cheapest.quoteDate,
       price: cheapest.price,
       currency
@@ -198,13 +154,16 @@ function cheapestFromGrid (response, trip) {
   }
 }
 
-function getCheapestTrips (responses) {
-  debug(`${responses.length} good responses`, util.inspect(responses))
-  return Promise.resolve(
-    responses.map(({ response, trip }) =>
-      trip.endDate ? cheapestFromGrid(response, trip) : cheapestFromQuotes(response, trip)
-    )
-  )
+function getCheapestForTrip (results) {
+  debug(`${results.length} good responses` + (results.length ? ` for ${results[0].trip._id}` : ''))
+
+  return results
+    // get cheapest price for all urls that were requested for a single trip
+    .map(({ trip, response, url }) => trip.endDate
+      ? cheapestFromGrid({ trip, response, url })
+      : cheapestFromQuotes({ trip, response, url }))
+    // sort all cheapest results ascending by price and return only the very cheapest
+    .sort((a, b) => a.price > b.price)[0]
 }
 
 /**
@@ -235,10 +194,12 @@ function findCurrentResults () {
   // get pending trips from database
   return Trip.find({ active: true })
     .exec()
-    // request trip data from skyscanner
+    // request trip data from skyscanner, returns data like [[r11, r12, r13...], [r21, r22...], ...]
     .then(trips => Promise.all(trips.map(searchSkyScanner)))
-    // // filter out the requests that went wrong
-    // .then(responses => Promise.resolve(responses.filter(res => res != null)))
+    // get cheapest result for each trip
+    .then(results => results.map(getCheapestForTrip))
+    // filter out the requests that went wrong
+    .then(cheapest => console.log(cheapest))
     // // get the responses that went well and went not so well and treat them accordingly
     // .then(getCheapestTrips)
 }
@@ -248,7 +209,7 @@ if (!module.parent) {
   cleanupOldtrips()
     .then(findCurrentResults)
     // save all trip data for which we found matching results
-    // .then(results => SearchResult.collection.insert(results.filter(r => r)))
+    // .then(results => SearchResult.collection.insert(results.filter(r => r) || []))
     // print out for stats
     .then(writeResult => {
       debug(`All done!`)

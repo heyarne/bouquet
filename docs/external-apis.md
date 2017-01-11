@@ -1990,3 +1990,95 @@ http://partners.api.skyscanner.net/apiservices/browsegrid/v1.0/${market}/${curre
 
 }
 ```
+
+### Getting info about a place
+URL: `http://partners.api.skyscanner.net/apiservices/autosuggest/v1.0/DE/EUR/en/?api_key=$api_key&query=$query`
+Example response:
+```
+{
+
+    "Places": [
+        {
+            "PlaceId": "DE-sky",
+            "PlaceName": "Germany",
+            "CountryId": "DE-sky",
+            "RegionId": "",
+            "CityId": "-sky",
+            "CountryName": "Germany"
+        },
+        {
+            "PlaceId": "FRAN-sky",
+            "PlaceName": "Frankfurt",
+            "CountryId": "DE-sky",
+            "RegionId": "",
+            "CityId": "FRAN-sky",
+            "CountryName": "Germany"
+        },
+        {
+            "PlaceId": "FRA-sky",
+            "PlaceName": "Frankfurt am Main",
+            "CountryId": "DE-sky",
+            "RegionId": "",
+            "CityId": "FRAN-sky",
+            "CountryName": "Germany"
+        },
+        {
+            "PlaceId": "HHN-sky",
+            "PlaceName": "Frankfurt Hahn",
+            "CountryId": "DE-sky",
+            "RegionId": "",
+            "CityId": "FRAN-sky",
+            "CountryName": "Germany"
+        },
+        {
+            "PlaceId": "LEJ-sky",
+            "PlaceName": "Leipzig",
+            "CountryId": "DE-sky",
+            "RegionId": "",
+            "CityId": "LEIP-sky",
+            "CountryName": "Germany"
+        },
+        {
+            "PlaceId": "DRS-sky",
+            "PlaceName": "Dresden",
+            "CountryId": "DE-sky",
+            "RegionId": "",
+            "CityId": "DRES-sky",
+            "CountryName": "Germany"
+        },
+        {
+            "PlaceId": "MUC-sky",
+            "PlaceName": "Munich",
+            "CountryId": "DE-sky",
+            "RegionId": "",
+            "CityId": "MUNI-sky",
+            "CountryName": "Germany"
+        },
+        {
+            "PlaceId": "STR-sky",
+            "PlaceName": "Stuttgart",
+            "CountryId": "DE-sky",
+            "RegionId": "",
+            "CityId": "STUT-sky",
+            "CountryName": "Germany"
+        },
+        {
+            "PlaceId": "HAJ-sky",
+            "PlaceName": "Hannover",
+            "CountryId": "DE-sky",
+            "RegionId": "",
+            "CityId": "HANN-sky",
+            "CountryName": "Germany"
+        },
+        {
+            "PlaceId": "HAMB-sky",
+            "PlaceName": "Hamburg",
+            "CountryId": "DE-sky",
+            "RegionId": "",
+            "CityId": "HAMB-sky",
+            "CountryName": "Germany"
+        }
+    ]
+
+}
+```

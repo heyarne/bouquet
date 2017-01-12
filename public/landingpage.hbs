@@ -1,16 +1,16 @@
-{{#if user}}
-    <h1>Welcome {{user.email}}!</h1>
-    <p>
-        Are you looking for your dashboard? Click <a href="/app/">here</a>!
-        <form action="/auth/logout" method="post">No? Maybe <input type="submit" value="logout" /> instead?</form>
-    </p>
-{{else}}
-    <h1>Hey, welcome to bouqet. Want to give it a try? Login!</h1>
-    <p>
-        Please enter your e-mail address. We will send you an e-mail and you can get started.
-    </p>
-    <form action="/auth/login" method="post">
-        <input type="text" name="email" value="" placeholder="Your e-mail adress">
-        <input type="submit" value="Login">
+{{#contentFor page}}landing{{/contentFor}}
+
+<div class="container">
+    <h1 class="title">Welcome to <strong>bouqet</strong>.</h1>
+    <h2 class="subtitle">An app to help you remember to get out and <strong>travel</strong> every once in a while.</h2>
+    <form class="form" action="/auth/login" method="post">
+        <div class="columns">
+            <div class="colum is-narrow">
+                <p class="control has-addons">
+                    <input class="input" type="text" name="email" placeholder="Enter your e-mail adress">
+                    <input class="button is-primary" type="submit" value="Sign in">
+                </p>
+            </div>
+        </div>
     </form>
-{{/if}}
+</div>

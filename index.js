@@ -51,12 +51,13 @@ app.set('view engine', 'hbs')
 app.set('views', __dirname + '/public')
 
 // set up the few routes where we actually render html on the server side
-app.get('/', (req, res) => res.render('landingpage', { user: req.user }))
-app.get('/app', (req, res) => req.user ? res.render('app') : res.redirect('/')) // TODO: Take care of /app/*
+app.get('/', (req, res) => req.user ? res.redirect('/app/') : res.render('landingpage', { user: req.user }))
+app.get('/app', (req, res) => req.user ? res.render('app') : res.redirect('/'))
 
 // serve our js and css resources
 const serveStatic = require('serve-static')
 app.use('/dist', serveStatic(__dirname + '/public/dist'))
+app.use('/img', serveStatic(__dirname + '/public/img'))
 
 // finally, expose our api routes
 const users = require('./middleware/api/users')

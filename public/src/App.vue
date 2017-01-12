@@ -48,7 +48,8 @@ export default {
 }
 </script>
 
-<style lang="sass">
+<style lang="scss">
 @import '../node_modules/bulma/bulma';
 @import '../node_modules/vue-flatpickr/theme/airbnb';
+@import './sass/landing'
 </style>

@@ -111,6 +111,7 @@ function cheapestFromQuotes ({response, trip, url}) {
   if (cheapest) {
     return {
       trip: trip._id,
+      createdAt: new Date(),
       date: new Date(cheapest.OutboundLeg.DepartureDate),
       platform: 'skyscanner',
       url: url.replace(/browse[^/]+/, 'referral'),
@@ -144,6 +145,7 @@ function cheapestFromGrid ({response, trip, url}) {
   if (cheapest) {
     return {
       trip: trip._id,
+      createdAt: new Date(),
       date: new Date(cheapest.departure),
       platform: 'skyscanner',
       url: url.replace(/browse[^/]+/, 'referral'),

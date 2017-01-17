@@ -22,11 +22,11 @@
       <p v-else>
         You currently have <strong>{{trips.length}} {{trips.length | pluralize('trip')}}</strong> planned.
       </p>
-      <ul>
-        <li v-for="trip in trips">
+      <div class="columns">
+        <div class="column is-one-third" v-for="trip in trips">
           <trip-card :trip="trip"></trip>
-        </li>
-      </ul>
+        </div>
+      </div>
       <p class="control">
         <router-link to="/trip/new" class="button is-primary">Add trip</router-link>
       </p>

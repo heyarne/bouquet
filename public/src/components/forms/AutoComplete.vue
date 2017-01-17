@@ -22,7 +22,7 @@
           v-for="(suggestion, index) in suggestions"
           :class="{ 'highlighted': index === highlighted }"
           @mouseenter="highlighted = index">
-          <a @click="chooseSuggestion(index)">{{suggestion | humanReadable}}</a>
+          <a @click="chooseSuggestion(index)">{{suggestion | readableLocation}}</a>
         </li>
       </ul>
     </p>
@@ -30,7 +30,7 @@
 
 <script>
 /* eslint-env browser */
-import humanReadable from '../../utils/human-readable-feature'
+import readableLocation from '../../filters/human-readable-location'
 
 function mapzenURL (term) {
   const query = encodeURIComponent(term)
@@ -68,7 +68,7 @@ export default {
     chooseSuggestion (index) {
       this.choice = this.suggestions[index]
       this.isVisible = false
-      this.query = this.choice ? humanReadable(this.choice) : ''
+      this.query = this.choice ? readableLocation(this.choice) : ''
       this.$emit('select', this.choice)
     },
 
@@ -107,8 +107,7 @@ export default {
         this.highlighted = Math.max(this.highlighted - 1, -1)
       }
     }
-  },
-  filters: { humanReadable }
+  }
 }
 </script>
 

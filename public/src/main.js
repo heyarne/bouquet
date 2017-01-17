@@ -12,6 +12,12 @@ import VueRouter from 'vue-router'
 Vue.use(VueResource)
 Vue.use(VueRouter)
 
+import readableLocation from './filters/human-readable-location'
+import pluralize from './filters/pluralize'
+
+Vue.filter('readableLocation', readableLocation)
+Vue.filter('pluralize', pluralize)
+
 // Configure VueResource
 Vue.http.options = {
   root: '/api/v1',

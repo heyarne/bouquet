@@ -27,7 +27,15 @@ router.post('/', requireLogin(), (req, res) => {
 
 router.get('/me', requireLogin(), (req, res) => {
   Trip.find({ _id: { $in: req.user.trips } })
-    // todo: find most recent results
+    .lean()
+    .then(trips => Promise.all(trips.map(trip =>
+      SearchResult.findOne({ trip: trip._id })
+        .sort('-createdAt')
+        .then(result => {
+          trip.lastResult = result
+          return trip
+        })
+    )))
     .then(trips => res.status(200).json(trips))
     .catch(({ message }) => res.status(500).json({ message }))
 })
@@ -38,8 +46,8 @@ router.get('/:id', requireLogin(), (req, res) => {
   }
 
   const { id } = req.params.id
-  const tripQuery = Trip.findOne(id)
-  const resultQuery = SearchResult.find({ tripQuery: id }).sort({ createdAt: -1 }).limit(30)
+  const tripQuery = Trip.findOne(id).lean()
+  const resultQuery = SearchResult.find({ tripQuery: id }).sort({ createdAt: -1 }).limit(30).lean(true)
   Promise.all([ tripQuery, resultQuery ])
     .then(([ trip, searchResults ]) => {
       trip.results = searchResults

@@ -20,7 +20,7 @@
         </p>
       </div>
       <p v-else>
-        You currently have <strong>{{trips.length}} trip<span v-if="trips.length !== 1">s</span></strong> planned.
+        You currently have <strong>{{trips.length}} {{trips.length | pluralize('trip')}}</strong> planned.
       </p>
       <ul>
         <li v-for="trip in trips">

@@ -7,7 +7,6 @@
  * @return {String}       The pluralized string
  */
 export default function pluralize (count, word) {
-  console.log('pluralize', arguments)
   if (count === 1) return word
 
   if (word.endsWith('y')) return word.replace(/y$/, 'ies')

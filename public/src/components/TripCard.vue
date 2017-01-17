@@ -26,7 +26,6 @@ export default {
   props: ['trip'],
   filters: {
     dateFormat (date, format = 'MMMM Do Y') {
-      console.log('dateFormat args:', arguments, format)
       return moment(date).format(format)
     }
   }

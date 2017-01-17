@@ -8,7 +8,7 @@
     "dev": "env-cmd ../.env watchify -vd -p browserify-hmr -e src/main.js -o dist/build.js",
     "lint": "eslint --ext .js,.vue src test/unit",
     "test": "karma start karma.conf.js",
-    "build": "env-cmd ../.env cross-env NODE_ENV=production browserify -p [ vueify/plugins/extract-css -o dist/build.css ] -e src/main.js | uglifyjs -c warnings=false -m > dist/build.js"
+    "build": "env-cmd ../.env browserify -g [ envify --NODE_ENV production ] -p [ vueify/plugins/extract-css -o dist/build.css ] -e src/main.js | uglifyjs -c warnings=false -m > dist/build.js"
   },
   "browserify": {
     "transform": [
@@ -18,7 +18,7 @@
     ]
   },
   "browser": {
-    "vue": "vue/dist/vue"
+    "vue": "vue/dist/vue.runtime.common.js"
   },
   "dependencies": {
     "bulma": "^0.3.0",

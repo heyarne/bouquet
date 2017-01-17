@@ -3,13 +3,18 @@
       <div class="card-content">
         <p>
          From <strong>{{trip.departure | readableLocation}}</strong> to <strong>{{trip.destination | readableLocation}}</strong>.<br>
-         Current price: {{trip.lastResult.price}}€
-         <small>Seen on {{trip.lastResult.quoteDate | dateFormat('MMMM Do') }}</small>
+         <span v-if="trip.lastResult">
+           Current price: {{trip.lastResult.price}}€
+           <small>Seen on {{trip.lastResult.quoteDate | dateFormat('MMMM Do') }}</small>
+         </span>
+         <span v-else>
+           No results yet. <small>Searching since {{trip.createdAt | dateFormat}}</small>.
+         </span>
         </p>
       </div>
       <div class="card-footer">
         <router-link :to="'/trip/' + trip._id" class="card-footer-item">Detail</router-link>
-        <a :href="trip.lastResult.url" class="card-footer-item">View result</a>
+        <a :href="trip.lastResult.url" class="card-footer-item" v-if="trip.lastResult">View result</a>
       </div>
     </article>
 </template>

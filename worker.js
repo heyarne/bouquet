@@ -73,7 +73,7 @@ function searchSkyScanner (trip) {
       as.map(a =>
         bs.filter(b => b !== a)
           .map(b => [ a, b ])
-        ).reduce((a, b) => a.concat(b))) // flatten one level
+        ).reduce((a, b) => a.concat(b), [])) // flatten one level
     .then(combinations => Promise.all(combinations.map(combo => {
       const url = skyScannerTripURL(trip, combo)
       debug(`Requesting ${url}`)
@@ -136,7 +136,7 @@ function cheapestFromGrid ({response, trip, url}) {
       })
     )
     // flatten the array
-    .reduce((a, b) => a.concat(b))
+    .reduce((a, b) => a.concat(b), [])
     // filter out nulls
     .filter(r => r)
     // sort by price ascending

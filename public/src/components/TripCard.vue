@@ -11,7 +11,7 @@
           <p>
            From <strong>{{trip.departure | humanReadable}}</strong> to <strong>{{trip.destination | humanReadable}}</strong>.<br>
            Current estimated price: <tt>$estimated_price € (found at Date)</tt><br>
-           <small>Searching since {{trip.createdAt}}.</small>
+           <small>Searching since {{trip.createdAt | humanDate }}.</small>
           </p>
         </div>
         <div class="level"></div>
@@ -21,10 +21,16 @@
 </template>
 
 <script>
+import moment from 'moment'
 import humanReadable from '../utils/human-readable-feature'
 
 export default {
   props: ['trip'],
-  filters: { humanReadable }
+  filters: {
+    humanReadable,
+    humanDate (date) {
+      return moment(date).format('MMMM Do Y')
+    }
+  }
 }
 </script>

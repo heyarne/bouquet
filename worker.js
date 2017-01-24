@@ -206,6 +206,23 @@ function findCurrentResults () {
     .then(results => results.map(getCheapestForTrip))
 }
 
+/**
+ * [sendBudgetAlarms description]
+ * @param  {[type]} resultIds [description]
+ * @return {Promise}
+ */
+function sendBudgetAlarms (resultIds) {
+  return SearchResult.find({ _id: { $in: resultIds } })
+    .populate('trip')
+    .then(results => Promise.all(
+      results.filter(r => r.price <= r.trip.budget)
+        .map(r => {
+          debug(`Should send notifications for result ${r._id}`)
+          return Promise.resolve()
+        })
+    ))
+}
+
 // if run from the command line...
 if (!module.parent) {
   cleanupOldtrips()
@@ -216,8 +233,10 @@ if (!module.parent) {
     .then(writeResult => {
       debug(`All done!`)
       debug(`Saved ${writeResult.insertedCount} new results`)
-      process.exit(0)
+      return writeResult.insertedIds
     })
+    .then(sendBudgetAlarms)
+    .then(_ => process.exit(0))
     .catch(err => {
       console.error(err)
       process.exit(1)

@@ -2,7 +2,7 @@
     <article class="card">
       <div class="card-content">
         <p>
-         From <strong>{{trip.departure | readableLocation}}</strong> to <strong>{{trip.destination | readableLocation}}</strong>.<br>
+         From <strong>{{trip.departure | readableLocation}}</strong> to <strong>{{trip.destination | readableLocation}}</strong><span v-if="trip.endDate || trip.duration"> and back</span>.<br>
          <span v-if="trip.lastResult">
            Current price: {{trip.lastResult.price}}€
            <small>Seen on {{trip.lastResult.quoteDate | dateFormat('MMMM Do') }}</small>

@@ -75,6 +75,10 @@ import eventBus from '../event-bus'
 import Flatpickr from 'vue-flatpickr'
 import AutoComplete from './forms/AutoComplete.vue'
 
+function showError (message) {
+  eventBus.$emit('notification', { type: 'error', message })
+}
+
 export default {
   components: { Flatpickr, AutoComplete },
   data () {
@@ -106,9 +110,10 @@ export default {
             type: 'info', message: 'OK, we\'ll keep an eye out! :)'
           })
         })
-        .catch(err => eventBus.$emit('notification', {
-          type: 'error', message: err.body.message
-        }))
+        .catch(err => Array.isArray(err.body)
+          ? err.body.forEach(({ message }) => showError(message))
+          : showError(err.message)
+        )
     },
     onSelectDeparture (place) {
       this.departure = place

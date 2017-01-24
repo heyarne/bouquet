@@ -8,11 +8,21 @@ const tripSchema = new mongoose.Schema({
     required: true
   },
   // Airport for departure
-  departure: { type: Object, required: true }, // actually type: feature
+  departure: {
+    type: Object,
+    required: [true, 'Please let us know where you want to depart from']
+  }, // actually type: feature
   // Airport for destination
-  destination: { type: Object, required: true }, // see above
+  destination: {
+    type: Object,
+    required: [true, 'Please tell us where you want to go to']
+  }, // see above
   // Start of search
-  startDate: { type: Date, required: true, index: true },
+  startDate: {
+    type: Date,
+    required: [true, 'Please fill in your date of departure'],
+    index: true
+  },
   // End of search
   endDate: { type: Date, index: true },
   // Duration of trip

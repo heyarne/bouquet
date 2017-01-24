@@ -13,8 +13,6 @@ router.post('/', requireLogin(), (req, res) => {
     duration: req.body.duration
   }
 
-  console.log(payload)
-
   new Trip(payload).save()
     .then(trip => {
       // update the user and re-return the trip
@@ -22,7 +20,15 @@ router.post('/', requireLogin(), (req, res) => {
       return req.user.save().then(_ => Promise.resolve(trip))
     })
     .then(trip => res.status(201).json(trip))
-    .catch(({ message }) => res.status(500).json({ message }))
+    .catch(err => {
+      if (err.name === 'ValidationError') {
+        const errors = Object.keys(err.errors)
+          .map(k => err.errors[k])
+        res.status(400).json(errors)
+      } else {
+        res.status(500).json({ message: err.message })
+      }
+    })
 })
 
 router.get('/me', requireLogin(), (req, res) => {

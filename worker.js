@@ -15,6 +15,7 @@ const fetch = require('node-fetch')
 const debug = require('debug')('bouquet:worker')
 const mongoose = require('mongoose')
 const moment = require('moment')
+const Throttle = require('promise-parallel-throttle')
 
 mongoose.Promise = global.Promise
 mongoose.connect(MONGODB_URI, _ => console.log(`Mongoose connected to ${MONGODB_URI}`))
@@ -74,22 +75,25 @@ function searchSkyScanner (trip) {
         bs.filter(b => b !== a)
           .map(b => [ a, b ])
         ).reduce((a, b) => a.concat(b), [])) // flatten one level
-    .then(combinations => Promise.all(combinations.map(combo => {
-      const url = skyScannerTripURL(trip, combo)
-      debug(`Requesting ${url}`)
-      return fetch(url)
-        // check the responses and reject the bad ones
-        .then(res => Promise[res.ok ? 'resolve' : 'reject'](res.json()))
-        // continue working with this result if everything's fine
-        .then(response => ({ trip, response, url }))
-        // if we have an error, resolve it and print it. we don't want it to stop
-        // further processing though, so we catch it early
-        .catch(err => {
-          console.error(`Bad response for ${trip._id}`)
-          console.error(err)
-          debug(util.inspect(err))
-        })
-    })))
+    .then(combinations => {
+      const requests = combinations.map(combo => () => {
+        const url = skyScannerTripURL(trip, combo)
+        debug(`Requesting ${url}`)
+        return fetch(url)
+          // check the responses and reject the bad ones
+          .then(res => Promise[res.ok ? 'resolve' : 'reject'](res.json()))
+          // continue working with this result if everything's fine
+          .then(response => ({ trip, response, url }))
+          // if we have an error, resolve it and print it. we don't want it to stop
+          // further processing though, so we catch it early
+          .catch(err => {
+            console.error(`Bad response for ${trip._id}`)
+            console.error(err)
+            debug(util.inspect(err))
+          })
+      })
+      return Throttle.all(requests, 3)
+    })
 }
 
 function cheapestFromQuotes ({response, trip, url}) {

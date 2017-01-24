@@ -9,7 +9,7 @@
     </p>
     <hr>
     <form method="post" @submit.prevent="onSubmit">
-      <h2 class="subtitle">Tell us about the journey&hellip;</h2>
+      <h2 class="subtitle">Tell us about the journey</h2>
       <div class="columns">
         <div class="column">
           <p class="control">
@@ -19,16 +19,15 @@
         </div>
         <div class="column">
           <p class="control">
-            <label class="label">Destination:</label>
+            <label class="label">City, country or region of destination:</label>
             <auto-complete name="from" placeholder="Please enter a place..." @select="onSelectDestination" />
           </p>
         </div>
       </div>
-      <h2 class="subtitle">When would be a good time?</h2>
       <div class="columns">
         <div class="column">
           <p class="control">
-            <label class="label">Earliest start:</label>
+            <label class="label">Earliest date of departure:</label>
             <flatpickr class="input" name="availability-start" placeholder="Please enter a date..." v-model="startDate" :options="config.datePicker" />
           </p>
         </div>
@@ -36,11 +35,9 @@
           <p class="control">
             <label class="label">Latest date of return:*</label>
             <flatpickr class="input" name="availability-end" placeholder="Please enter a date..." v-model="endDate" :options="config.datePicker" />
-            <span class="help">* Optional</span>
           </p>
         </div>
       </div>
-      <h2 class="subtitle">For how long do you want to travel?</h2>
       <div class="columns">
         <div class="column is-half">
           <p class="control">

@@ -42,7 +42,8 @@ function mapzenURL (term) {
     'county',
     'locality'
   ]
-  return `https://search.mapzen.com/v1/autocomplete?api_key=${process.env.MAPZEN_API_KEY}&layers=${layers.join(',')}&text=${query}`
+  const sources = ['whosonfirst']
+  return `https://search.mapzen.com/v1/autocomplete?api_key=${process.env.MAPZEN_API_KEY}&sources=${sources.join(',')}&layers=${layers.join(',')}&text=${query}`
 }
 
 /**

@@ -9,7 +9,6 @@
           <div class="nav-right">
             <span class="nav-item"><router-link to="/">Dashboard</router-link></span>
             <span class="nav-item"><router-link to="/profile">Profile</router-link></span>
-            <span class="nav-item"><router-link to="/info">Vue.js Info</router-link></span>
             <span class="nav-item"><a href="#" @click="logout">Logout</a></span>
           </div>
         </div>

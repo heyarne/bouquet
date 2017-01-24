@@ -24,7 +24,7 @@ router.post('/', requireLogin(), (req, res) => {
       if (err.name === 'ValidationError') {
         const errors = Object.keys(err.errors)
           .map(k => err.errors[k])
-        res.status(400).json(errors)
+        res.status(422).json(errors)
       } else {
         res.status(500).json({ message: err.message })
       }

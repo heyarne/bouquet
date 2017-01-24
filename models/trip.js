@@ -17,6 +17,8 @@ const tripSchema = new mongoose.Schema({
   endDate: { type: Date, index: true },
   // Duration of trip
   duration: { type: Object },
+  // Price for alerts
+  budget: { type: Number },
   // should it be searched for at the moment?
   active: {
     type: Boolean,

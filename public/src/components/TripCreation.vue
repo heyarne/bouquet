@@ -42,13 +42,22 @@
         <div class="column is-half">
           <p class="control">
             <label class="label">Maximum trip duration in days:*</label>
-            <input class="input" type="text" name="duration" v-model="duration">
-            <span class="help">* Optional</span>
+            <input class="input" type="text" name="duration" placeholder="If you don't want to go back, it's fine :)" v-model="duration">
+          </p>
+        </div>
+        <div class="column is-half">
+          <p class="conrtol">
+            <label class="label">Budget alert:*</label>
+            <input class="input" placeholder="Flight price in €" type="number" name="buget" v-model="budget">
+            <span class="help">Are you on a budget? Tell us here an we'll shoot you a message as soon as we find something according to your expectations.</span>
           </p>
         </div>
       </div>
       <div class="columns">
         <div class="column is-clearfix">
+          <p class="control is-pulled-left">
+            Fields marked with a <strong>*</strong> are optional and don't have to be filled in.
+          </p>
           <p class="control is-pulled-right">
             <input type="submit" class="button is-medium is-primary" value="Create trip">
           </p>
@@ -70,11 +79,6 @@ export default {
   components: { Flatpickr, AutoComplete },
   data () {
     return {
-      departure: null,
-      destination: null,
-      startDate: null,
-      endDate: null,
-      duration: null,
       config: {
         datePicker: {
           minDate: 'today',
@@ -90,7 +94,8 @@ export default {
         destination: this.destination,
         startDate: new Date(this.startDate).toJSON(),
         endDate: this.endDate ? new Date(this.endDate).toJSON() : null,
-        duration: this.duration
+        duration: this.duration,
+        budget: this.budget
       }
 
       this.$http.post('trips', trip)

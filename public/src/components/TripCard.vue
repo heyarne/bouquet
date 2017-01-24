@@ -13,7 +13,7 @@
         </p>
       </div>
       <div class="card-footer">
-        <router-link :to="'/trip/' + trip._id" class="card-footer-item">Detail</router-link>
+        <router-link :to="'/trip/' + trip._id" class="card-footer-item">Details</router-link>
         <a :href="trip.lastResult.url" class="card-footer-item" v-if="trip.lastResult">View result</a>
       </div>
     </article>

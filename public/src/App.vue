@@ -1,25 +1,28 @@
 <template>
   <div>
-    <header class="hero is-primary">
-      <nav class="nav has-shadow">
-        <div class="container">
-          <div class="nav-left">
-            <h1 href="/" class="nav-item title">bouquet</h1>
-          </div>
-          <div class="nav-right">
-            <span class="nav-item"><router-link to="/">Dashboard</router-link></span>
-            <span class="nav-item"><router-link to="/profile">Profile</router-link></span>
-            <span class="nav-item"><a href="#" @click="logout">Logout</a></span>
-          </div>
-        </div>
-      </nav>
-    </header>
-    <toast />
-    <section class="section">
+    <nav class="nav has-shadow">
       <div class="container">
-        <router-view />
+        <div class="nav-left">
+          <router-link to="/" tag="strong" class="nav-item is-medium">bouquet</router-link>
+        </div>
+        <span class="nav-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+        <div class="nav-right nav-menu">
+          <router-link to="/" active-class="is-active" class="nav-item is-tab">
+            Dashboard
+          </router-link>
+          <router-link to="/profile" active-class="is-active" class="nav-item is-tab">
+            Profile
+          </router-link>
+          <a href="#" @click="logout" class="nav-item is-tab">Logout</a>
+        </div>
       </div>
-    </section>
+    </nav>
+    <toast />
+    <router-view />
     <footer class="footer">
       <div class="container has-text-right">
         Made with ❤ and 💦

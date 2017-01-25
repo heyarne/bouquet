@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="trip creation">
+  <div class="trip form">
     <div v-if="!editing">
       <h1 class="title">Create a new trip</h1>
       <p>
@@ -84,10 +84,11 @@ function showError (message) {
 }
 
 export default {
+  props: ['trip'],
   components: { Flatpickr, AutoComplete },
   data () {
     return {
-      editing: !!this.$route.params.tripId,
+      editing: !!this.trip,
       config: {
         datePicker: {
           minDate: 'today',

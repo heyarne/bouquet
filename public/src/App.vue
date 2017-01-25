@@ -50,5 +50,6 @@ export default {
 <style lang="scss">
 @import '../node_modules/bulma/bulma';
 @import '../node_modules/vue-flatpickr/theme/airbnb';
+@import '../node_modules/quill/dist/quill.bubble';
 @import './sass/landing'
 </style>

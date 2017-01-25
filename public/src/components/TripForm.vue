@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="trip creation">
-    <h1 class="title">Create a new trip</h1>
+    <h1 class="title" v-if="!editing">Create a new trip</h1>
     <p>
       Use this form to give us some information about where you want to go. We will use it to continously check whether we'll find something you may like. If we do, we'll remind you with an e-mail that you had some plans.
     </p>
@@ -83,6 +83,7 @@ export default {
   components: { Flatpickr, AutoComplete },
   data () {
     return {
+      editing: !!this.$route.params.id,
       config: {
         datePicker: {
           minDate: 'today',

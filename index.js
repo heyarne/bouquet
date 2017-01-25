@@ -21,8 +21,9 @@ const bodyParser = require('body-parser')
 const session = require('express-session')
 const SessionStore = require('connect-mongo')(session)
 
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: '512kb' }))
 app.use(bodyParser.urlencoded({
+  limit: '512kb',
   extended: true // parse with `qs`, thus enabling stuff like arrays
 }))
 app.use(session({

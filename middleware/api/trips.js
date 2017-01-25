@@ -47,9 +47,9 @@ router.get('/me', requireLogin(), (req, res) => {
 })
 
 router.get('/:id', requireLogin(), checkTripPermissions(), (req, res) => {
-  const { id } = req.params.id
-  const tripQuery = Trip.findOne(id).lean()
-  const resultQuery = SearchResult.find({ tripQuery: id }).sort({ createdAt: -1 }).limit(30).lean(true)
+  const { id } = req.params
+  const tripQuery = Trip.findById({ _id: id }).lean()
+  const resultQuery = SearchResult.find({ trip: id }).sort({ createdAt: -1 }).limit(30).lean(true)
   Promise.all([ tripQuery, resultQuery ])
     .then(([ trip, searchResults ]) => {
       trip.results = searchResults

@@ -1,15 +1,18 @@
 <template lang="html">
   <div class="trip creation">
-    <h1 class="title" v-if="!editing">Create a new trip</h1>
-    <p>
-      Use this form to give us some information about where you want to go. We will use it to continously check whether we'll find something you may like. If we do, we'll remind you with an e-mail that you had some plans.
-    </p>
-    <p>
-      None of this is going to be shared or published, no worries.
-    </p>
-    <hr>
+    <div v-if="!editing">
+      <h1 class="title">Create a new trip</h1>
+      <p>
+        Use this form to give us some information about where you want to go. We will use it to continously check whether we'll find something you may like. If we do, we'll remind you with an e-mail that you had some plans.
+      </p>
+      <p>
+        None of this is going to be shared or published, no worries.
+      </p>
+      <hr>
+    </div>
     <form method="post" @submit.prevent="onSubmit">
-      <h2 class="subtitle">Tell us about the journey</h2>
+      <h2 class="subtitle" v-if="editing">Modify your search criteria</h2>
+      <h2 class="subtitle" v-else>Tell us about the journey</h2>
       <div class="columns">
         <div class="column">
           <p class="control">
@@ -59,7 +62,8 @@
             Fields marked with a <strong>*</strong> are optional and don't have to be filled in.
           </p>
           <p class="control is-pulled-right">
-            <input type="submit" class="button is-medium is-primary" value="Create trip">
+            <input type="submit" class="button is-medium is-primary" value="Modify trip" v-if="editing">
+            <input type="submit" class="button is-medium is-primary" value="Create trip" v-else>
           </p>
         </div>
       </div>
@@ -83,7 +87,7 @@ export default {
   components: { Flatpickr, AutoComplete },
   data () {
     return {
-      editing: !!this.$route.params.id,
+      editing: !!this.$route.params.tripId,
       config: {
         datePicker: {
           minDate: 'today',

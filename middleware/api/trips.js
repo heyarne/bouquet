@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { requireLogin } = require('../session-utils')
+const { requireLogin, checkTripPermissions } = require('../session-utils')
 const { Trip } = require('../../models/trip')
 const { SearchResult } = require('../../models/search-result')
 
@@ -46,11 +46,7 @@ router.get('/me', requireLogin(), (req, res) => {
     .catch(({ message }) => res.status(500).json({ message }))
 })
 
-router.get('/:id', requireLogin(), (req, res) => {
-  if (req.user.trips.indexOf(req.params.id) === -1) {
-    res.status(403).json({ message: 'You\'re not allowed to access this' })
-  }
-
+router.get('/:id', requireLogin(), checkTripPermissions(), (req, res) => {
   const { id } = req.params.id
   const tripQuery = Trip.findOne(id).lean()
   const resultQuery = SearchResult.find({ tripQuery: id }).sort({ createdAt: -1 }).limit(30).lean(true)
@@ -58,6 +54,21 @@ router.get('/:id', requireLogin(), (req, res) => {
     .then(([ trip, searchResults ]) => {
       trip.results = searchResults
       res.status(200).json(trip)
+    })
+})
+
+router.put('/:id', requireLogin(), checkTripPermissions(), (req, res) => {
+  const { notes } = req.body
+  Trip.findOneAndUpdate({ _id: req.params.id }, { notes })
+    .then(trip => res.status(200).json(trip))
+    .catch(err => {
+      if (err.name === 'ValidationError') {
+        const errors = Object.keys(err.errors)
+          .map(k => err.errors[k])
+        res.status(422).json(errors)
+      } else {
+        res.status(500).json({ message: err.message })
+      }
     })
 })
 

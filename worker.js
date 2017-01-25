@@ -71,11 +71,18 @@ function searchSkyScanner (trip) {
   return Promise.all([ skyScannerPlaceId(trip.departure), skyScannerPlaceId(trip.destination) ])
     // combine [ a, b ] x [ b, c ] to [[ab], [ac], [bc]] so departure and arrival place is always different
     .then(([as = [], bs = []]) =>
-      as.map(a =>
-        bs.filter(b => b !== a)
-          .map(b => [ a, b ])
-        ).reduce((a, b) => a.concat(b), [])) // flatten one level
+      (as.length === 0 || bs.length === 0)
+        ? []
+        : as.map(a =>
+            bs.filter(b => b !== a)
+              .map(b => [ a, b ])
+            ).reduce((a, b) => a.concat(b), [])) // flatten one level
     .then(combinations => {
+      if (!combinations.length) {
+        debug(`Skipping search because no place id is found`)
+        return Promise.resolve([])
+      }
+
       const requests = combinations.map(combo => () => {
         const url = skyScannerTripURL(trip, combo)
         debug(`Requesting ${url}`)
@@ -228,7 +235,14 @@ if (!module.parent) {
   cleanupOldtrips()
     .then(findCurrentResults)
     // save all trip data for which we found matching results
-    .then(results => SearchResult.collection.insert(results.filter(r => r) || []))
+    .then(results => {
+      const r = results.filter(r => r) || []
+      if (r.length) {
+        return SearchResult.collection.insert(r)
+      } else {
+        return { insertedCount: 0, insertedIds: [] }
+      }
+    })
     // print out for stats
     .then(writeResult => {
       debug(`All done!`)

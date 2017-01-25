@@ -2,7 +2,7 @@
   <form @submit.prevent="saveNotes">
     <div class="content is-medium">
       <wysiwyg
-        placeholder="Take some notes and remind yourself what to do. Just start typing..."
+        placeholder="Take some notes and remind yourself what to do. You can add images, links, lists... Just start typing!"
         :contents="trip.notes && JSON.parse(trip.notes)"
         :focus="true"
         @input="updateNotes" />
@@ -62,6 +62,3 @@ export default {
   }
 }
 </script>
-
-<style lang="css">
-</style>

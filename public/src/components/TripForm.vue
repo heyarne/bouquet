@@ -1,15 +1,5 @@
 <template lang="html">
   <div class="trip form">
-    <div v-if="!editing">
-      <h1 class="title">Create a new trip</h1>
-      <p>
-        Use this form to give us some information about where you want to go. We will use it to continously check whether we'll find something you may like. If we do, we'll remind you with an e-mail that you had some plans.
-      </p>
-      <p>
-        None of this is going to be shared or published, no worries.
-      </p>
-      <hr>
-    </div>
     <form method="post" @submit.prevent="onSubmit">
       <h2 class="subtitle" v-if="editing">Modify your search criteria</h2>
       <h2 class="subtitle" v-else>Tell us about the journey</h2>
@@ -82,6 +72,9 @@ import AutoComplete from './forms/AutoComplete.vue'
 function showError (message) {
   eventBus.$emit('notification', { type: 'error', message })
 }
+
+const tripProperties = [ 'departure', 'destination', 'startDate', 'endDate', 'duration', 'budget' ]
+const editable = tripProperties.slice(2) // all except 'departure' and 'destination'
 
 export default {
   props: ['trip'],

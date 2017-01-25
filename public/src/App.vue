@@ -11,10 +11,10 @@
           <span></span>
         </span>
         <div class="nav-right nav-menu">
-          <router-link to="/" active-class="is-active" class="nav-item is-tab">
+          <router-link to="/" active-class="is-active" class="nav-item is-tab" exact>
             Dashboard
           </router-link>
-          <router-link to="/profile" active-class="is-active" class="nav-item is-tab">
+          <router-link to="/profile" active-class="is-active" class="nav-item is-tab" exact>
             Profile
           </router-link>
           <a href="#" @click="logout" class="nav-item is-tab">Logout</a>

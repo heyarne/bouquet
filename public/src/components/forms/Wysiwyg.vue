@@ -36,7 +36,6 @@ export default {
     value (value) {
       // populate with data from the database and focus only the empty editor
       const contents = JSON.parse(value)
-      console.log('got content', contents)
       this.quill.setContents(contents)
       if (contents.ops[0].length > 1 || contents.ops[0].insert !== '\n') {
         this.quill.focus(false)

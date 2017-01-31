@@ -14,20 +14,13 @@
       </div>
       <div class="card-footer">
         <router-link :to="'/trip/' + trip._id" class="card-footer-item">Details</router-link>
-        <a :href="trip.lastResult.url" class="card-footer-item" v-if="trip.lastResult">View result</a>
+        <a :href="trip.lastResult.url" class="card-footer-item" v-if="trip.lastResult">→ To Skyscanner</a>
       </div>
     </article>
 </template>
 
 <script>
-import moment from 'moment'
-
 export default {
-  props: ['trip'],
-  filters: {
-    dateFormat (date, format = 'MMMM Do Y') {
-      return moment(date).format(format)
-    }
-  }
+  props: ['trip']
 }
 </script>

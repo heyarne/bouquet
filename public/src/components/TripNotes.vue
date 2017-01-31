@@ -2,7 +2,7 @@
   <form @submit.prevent="saveNotes">
     <div class="content is-medium">
       <wysiwyg
-        placeholder="Take some notes and remind yourself what to do. You can add images, links, lists... Just start typing!"
+        placeholder="Write down what you want to remind yourself to do. You can add images, links, lists... Just start typing!"
         :contents="trip.notes && JSON.parse(trip.notes)"
         :focus="true"
         @input="updateNotes" />
@@ -15,7 +15,7 @@
             'is-medium': true,
             'is-primary': true,
             'is-loading': loading
-            }" value="Save note">
+            }" value="Save">
         </p>
       </div>
     </div>
@@ -62,3 +62,10 @@ export default {
   }
 }
 </script>
+
+<style>
+.ql-editor {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+</style>

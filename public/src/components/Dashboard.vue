@@ -7,11 +7,10 @@
           <p class="subtitle" v-if="!trips.length">Thanks for trying out bouquet.</p>
           <div v-if="!trips.length">
             <p>
-              The idea is that you can save trips you never really got around taking. Tell us when you want to go and what your budget is more or less and we'll alert you as soon as we find something.
-              It seems like you don't have created any trips yet.
+              We help you take trips you never really got around taking. Describe your trip and what you're willing to spend, we'll keep an eye open for you and notify you about suitable offers. <em>It seems like you have not created any trips yet.</em>
             </p>
             <p>
-              <router-link to="/trip/new" class="button is-white is-outlined">Create a new one?</router-link>
+              <router-link to="/trip/new" class="button is-white is-outlined">Plan a new trip</router-link>
             </p>
           </div>
           <p class="subtitle" v-else>
@@ -22,9 +21,7 @@
     </header>
     <section class="section">
       <div class="container">
-        <div class="message loading" v-if="loading">
-          <div class="message-header">Loading...</div>
-        </div>
+        <div v-if="loading">Loading...</div>
 
         <article class="message is-warning" v-if="error">
           <div class="message-body">{{ error.message }}</div>
@@ -39,7 +36,7 @@
           <div class="columns">
             <div class="column clearfix">
               <p class="control is-pulled-right">
-                <router-link to="/trip/new" class="button is-medium is-primary">Add trip</router-link>
+                <router-link to="/trip/new" class="button is-medium is-primary">Plan new trip</router-link>
               </p>
             </div>
           </div>

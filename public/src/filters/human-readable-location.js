@@ -4,6 +4,6 @@
  * @param  {Feature} feature
  * @return {String}
  */
-export default function (feature) {
+export default function humanReadableLocation (feature) {
   return feature.properties.label
 }

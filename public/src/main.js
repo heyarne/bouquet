@@ -12,9 +12,11 @@ import VueRouter from 'vue-router'
 Vue.use(VueResource)
 Vue.use(VueRouter)
 
+import dateFormat from './filters/date-format'
 import readableLocation from './filters/human-readable-location'
 import pluralize from './filters/pluralize'
 
+Vue.filter('dateFormat', dateFormat)
 Vue.filter('readableLocation', readableLocation)
 Vue.filter('pluralize', pluralize)
 

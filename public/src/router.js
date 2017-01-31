@@ -5,7 +5,7 @@ import VueRouter from 'vue-router'
 import Dashboard from './components/Dashboard.vue'
 import TripCreation from './components/TripCreation.vue'
 import TripDetail from './components/TripDetail.vue'
-import TripNotes from './components/TripNotes.vue'
+import TripStatus from './components/TripStatus.vue'
 import TripForm from './components/TripForm.vue'
 import NotFound from './components/NotFound.vue'
 
@@ -16,10 +16,10 @@ const routes = [
   {
     name: 'trip',
     path: '/trip/:tripId',
-    redirect: { name: 'tripNotes' },
+    redirect: { name: 'tripStatus' },
     component: TripDetail,
     children: [
-      { name: 'tripNotes', path: 'notes', component: TripNotes },
+      { name: 'tripStatus', path: 'status', component: TripStatus },
       { name: 'tripEdit', path: 'edit', component: TripForm }
     ]
   },

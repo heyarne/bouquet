@@ -6,11 +6,8 @@
         <div class="container">
           <div class="tabs">
             <ul>
-              <router-link tag="li" to="/TODO" active-class="is-active">
-                <a>Status</a>
-              </router-link>
-              <router-link tag="li" :to="{name: 'tripNotes', params: {tripId: id} }" active-class="is-active">
-                <a>Notes</a>
+              <router-link tag="li" :to="{name: 'tripStatus', params: {tripId: id} }" active-class="is-active">
+                <a>Overview</a>
               </router-link>
               <router-link tag="li" :to="{name: 'tripEdit', params: {tripId: id} }" active-class="is-active">
                 <a>Edit</a>

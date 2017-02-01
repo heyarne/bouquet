@@ -172,15 +172,14 @@ router.post('/login', (req, res) => {
   return res.redirect(portierURL)
 })
 
-router.post('/verify', (req, res, next) => {
+router.post('/verify', (req, res) => {
   // first check if we've got an error from the broker
   const { error, error_description } = req.params
   if (error != null) {
-    // TODO: Proper error handling (not in this middleware)
     res
       .status(400)
       .json({ error: `Broker Error (${error}): ${error_description}` }) // eslint-disable-line
-    return next()
+    return
   }
 
   // if not, check the JWT
@@ -190,7 +189,6 @@ router.post('/verify', (req, res, next) => {
     .then(user => {
       req.session.email = user.email
       res.redirect('/')
-      next()
     })
     .catch(err => res.status(403).json({ message: err.message }))
 })

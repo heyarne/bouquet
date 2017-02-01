@@ -5,7 +5,7 @@
         <div class="level-item">
           <p class="subtitle is-5">Searching since <strong>{{trip.createdAt | dateFormat}}</strong></p>
         </div>
-        <div class="level-item">
+        <div class="level-item" v-if="trip.results.length">
           <spark-lines :data="trip.results.map(r => r.price)" />
         </div>
       </div>
@@ -16,7 +16,7 @@
         <div class="level-item">
           <p class="subtitle is-5">
             Current price:
-            <span v-if="trip.results[0].price < trip.budget">
+            <span v-if="trip.results.length && trip.results[0].price < trip.budget">
               <strong class="is-primary"><a :href="trip.results[0].url">{{trip.results[0].price}} EUR ↗</a></strong>
             </span>
             <span v-else>{{trip.results[0].price}} EUR <a :href="trip.results[0].url">↗</a></span>

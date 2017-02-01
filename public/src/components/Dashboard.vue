@@ -7,7 +7,7 @@
           <p class="subtitle" v-if="!trips.length">Thanks for trying out bouquet.</p>
           <div v-if="!trips.length">
             <p>
-              We help you take trips you never really got around taking. Describe your trip and what you're willing to spend, we'll keep an eye open for you and notify you about suitable offers. <em>It seems like you have not created any trips yet.</em>
+              We help you take trips you never really got around taking. Describe your trip and what you're willing to spend — we'll keep an eye out for you and notify you about suitable offers. It seems like you have not created any trips yet.
             </p>
             <p>
               <router-link to="/trip/new" class="button is-white is-outlined">Plan a new trip</router-link>

@@ -25,11 +25,12 @@ export default {
     this.quill = quill
     this.$emit('quill-referece', quill)
 
-    if (this.contents.ops.length === 1 && this.focus) {
+    if (!this.contents || this.contents.ops.length === 1 && this.focus) {
       quill.focus()
+    } else {
+      quill.setContents(this.contents)
     }
 
-    quill.setContents(this.contents)
     quill.on('text-change', _ => this.$emit('input', quill.getContents()))
   },
   watch: {

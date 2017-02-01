@@ -36,7 +36,7 @@ export default {
 
 <style scoped>
 .leaflet-map {
-  height: 20vh;
+  height: 50vh;
   position: relative;
   z-index: -1;
   pointer-events: none;

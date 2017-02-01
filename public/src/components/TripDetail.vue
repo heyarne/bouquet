@@ -4,6 +4,7 @@
       <leaflet :geojson="trip.destination" />
       <div class="section">
         <div class="container">
+          <h1 class="title">You're viewing your trip from <strong>{{trip.departure | readableLocation}}</strong> to <strong>{{trip.destination | readableLocation}}</strong>.</h1>
           <div class="tabs">
             <ul>
               <router-link tag="li" :to="{name: 'tripStatus', params: {tripId: id} }" active-class="is-active">
@@ -14,7 +15,6 @@
               </router-link>
             </ul>
           </div>
-          <h1 class="title">You're viewing your trip from <strong>{{trip.departure | readableLocation}}</strong> to <strong>{{trip.destination | readableLocation}}</strong>.</h1>
           <router-view :trip="trip" />
         </div>
       </div>

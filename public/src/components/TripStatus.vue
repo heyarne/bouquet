@@ -11,7 +11,7 @@
       </div>
       <div class="level-right">
         <div class="level-item" v-if="trip.budget">
-          <p class="subtitle is-5">Budget: {{trip.budget}} EUR</p>
+          <p class="subtitle is-5">Your Budget: <strong>{{trip.budget}} EUR</strong></p>
         </div>
         <div class="level-item">
           <p class="subtitle is-5">

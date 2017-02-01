@@ -3,17 +3,14 @@ const { requireLogin, checkTripPermissions } = require('../session-utils')
 const { Trip } = require('../../models/trip')
 const { SearchResult } = require('../../models/search-result')
 
-router.post('/', requireLogin(), (req, res) => {
-  const payload = {
-    user: req.user._id,
-    departure: req.body.departure,
-    destination: req.body.destination,
-    startDate: req.body.startDate,
-    endDate: req.body.endDate,
-    duration: req.body.duration
-  }
+// TODO: Nicer error handling
 
-  new Trip(payload).save()
+router.post('/', requireLogin(), (req, res) => {
+  const user = req.user._id
+  const { departure, destination, startDate, endDate } = req.body
+
+  new Trip({ user, departure, destination, startDate, endDate })
+    .save()
     .then(trip => {
       // update the user and re-return the trip
       req.user.trips.push(trip._id)
@@ -58,6 +55,26 @@ router.get('/:id', requireLogin(), checkTripPermissions(), (req, res) => {
 })
 
 router.put('/:id', requireLogin(), checkTripPermissions(), (req, res) => {
+  const { startDate, endDate, budget } = req.body
+  const payload = { startDate }
+
+  if (endDate) payload.endDate = endDate
+  if (budget) payload.budget = budget
+
+  Trip.findOneAndUpdate({ _id: req.params.id }, payload)
+    .then(trip => res.status(200).json(trip))
+    .catch(err => {
+      if (err.name === 'ValidationError') {
+        const errors = Object.keys(err.errors)
+          .map(k => err.errors[k])
+        res.status(422).json(errors)
+      } else {
+        res.status(500).json({ message: err.message })
+      }
+    })
+})
+
+router.put('/:id/notes', requireLogin(), checkTripPermissions(), (req, res) => {
   const { notes } = req.body
   Trip.findOneAndUpdate({ _id: req.params.id }, { notes })
     .then(trip => res.status(200).json(trip))

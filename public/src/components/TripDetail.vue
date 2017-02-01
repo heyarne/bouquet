@@ -14,7 +14,7 @@
               </router-link>
             </ul>
           </div>
-          <h1 class="title">You're viewing your trip to {{trip.destination | readableLocation}}.</h1>
+          <h1 class="title">You're viewing your trip from <strong>{{trip.departure | readableLocation}}</strong> to <strong>{{trip.destination | readableLocation}}</strong>.</h1>
           <router-view :trip="trip" />
         </div>
       </div>

@@ -9,7 +9,6 @@ export default {
     this.$el.width = 144
     this.$el.height = 24
 
-    console.log('prices', this.data)
     // min == height
     // max == 0
     this.min = Math.min(this.limit || this.data[0], ...this.data)

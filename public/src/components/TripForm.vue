@@ -3,7 +3,7 @@
     <form method="post" @submit.prevent="onSubmit">
       <h2 class="subtitle" v-if="editing">Modify your search criteria</h2>
       <h2 class="subtitle" v-else>Tell us about the journey</h2>
-      <div class="columns">
+      <div class="columns" v-if="!editing">
         <div class="column">
           <p class="control">
             <label class="label">Place of departure:</label>
@@ -57,6 +57,8 @@
 
 <script>
 /* eslint-env browser */
+import moment from 'moment'
+
 import router from '../router'
 import eventBus from '../event-bus'
 
@@ -67,15 +69,14 @@ function showError (message) {
   eventBus.$emit('notification', { type: 'error', message })
 }
 
-const tripProperties = [ 'departure', 'destination', 'startDate', 'endDate', 'duration', 'budget' ]
-const editable = tripProperties.slice(2) // all except 'departure' and 'destination'
-
 export default {
   props: ['trip'],
   components: { Flatpickr, AutoComplete },
   data () {
     return {
       editing: !!this.trip,
+      startDate: this.trip ? moment(this.trip.startDate).format('YYYY-MM-DD') : null,
+      endDate: this.trip && this.trip.endDate ? moment(this.trip.endDate).format('YYYY-MM-DD') : null,
       config: {
         datePicker: {
           minDate: 'today',
@@ -87,15 +88,18 @@ export default {
   methods: {
     onSubmit () {
       const trip = {
-        departure: this.departure,
-        destination: this.destination,
+        departure: this.trip ? this.trip.departure : this.departure,
+        destination: this.trip ? this.trip.destination : this.destination,
         startDate: new Date(this.startDate).toJSON(),
         endDate: this.endDate ? new Date(this.endDate).toJSON() : null,
-        duration: this.duration,
         budget: this.budget
       }
 
-      this.$http.post('trips', trip)
+      const request = this.editing
+        ? this.$http.put(`trips/${this.$route.params.tripId}`, trip)
+        : this.$http.post('trips', trip)
+
+      request
         .then(res => res.json())
         .then(res => {
           router.replace('/')

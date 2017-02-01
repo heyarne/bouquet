@@ -13,10 +13,10 @@
         <div class="level-item" v-if="trip.budget">
           <p class="subtitle is-5">Your Budget: <strong>{{trip.budget}} EUR</strong></p>
         </div>
-        <div class="level-item">
+        <div class="level-item" v-if="trip.results.length">
           <p class="subtitle is-5">
             Current price:
-            <span v-if="trip.results.length && trip.results[0].price < trip.budget">
+            <span v-if="trip.results[0].price < trip.budget">
               <strong class="is-primary"><a :href="trip.results[0].url">{{trip.results[0].price}} EUR ↗</a></strong>
             </span>
             <span v-else>{{trip.results[0].price}} EUR <a :href="trip.results[0].url">↗</a></span>

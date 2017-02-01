@@ -5,6 +5,9 @@
         <div class="level-item">
           <p class="subtitle is-5">Searching since <strong>{{trip.createdAt | dateFormat}}</strong></p>
         </div>
+        <div class="level-item">
+          <spark-lines :data="trip.results.map(r => r.price)" />
+        </div>
       </div>
       <div class="level-right">
         <div class="level-item" v-if="trip.budget">
@@ -28,10 +31,11 @@
 </template>
 
 <script>
+import SparkLines from './SparkLines.vue'
 import TripNotes from './TripNotes.vue'
 
 export default {
   props: ['trip'],
-  components: { TripNotes }
+  components: { SparkLines, TripNotes }
 }
 </script>

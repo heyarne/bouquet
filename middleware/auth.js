@@ -127,6 +127,9 @@ function discoverKeys (broker) {
  * @return  {Promise}
  */
 function getVerifiedEmail (token) {
+  // probably an invalid auth code
+  if (!token) return Promise.reject({ message: 'Login unsuccesful' })
+
   return discoverKeys(process.env.PORTIER_BROKER_URL)
     .then(keys => {
       const [ rawHeader ] = token.split('.')
@@ -189,7 +192,7 @@ router.post('/verify', (req, res, next) => {
       res.redirect('/')
       next()
     })
-    .catch(err => next(err))
+    .catch(err => res.status(403).json({ message: err.message }))
 })
 
 router.post('/logout', (req, res) => {

@@ -34,12 +34,6 @@
       <div class="columns">
         <div class="column is-half">
           <p class="control">
-            <label class="label">Maximum trip duration in days:*</label>
-            <input class="input" type="text" name="duration" placeholder="If you don't want to go back, it's fine :)" v-model="duration">
-          </p>
-        </div>
-        <div class="column is-half">
-          <p class="conrtol">
             <label class="label">Budget alert:*</label>
             <input class="input" placeholder="Flight price in €" type="number" name="buget" v-model="budget">
             <span class="help">Are you on a budget? Tell us here an we'll shoot you a message as soon as we find something according to your expectations.</span>

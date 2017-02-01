@@ -22,7 +22,8 @@
     <router-view />
     <footer class="footer">
       <div class="container has-text-right">
-        Made with ❤ and 💦
+        Made with ❤ by Arne Schlüter.<br>
+        Search results powered by <a href="https://www.skyscanner.net/">SkyScanner.net</a>
       </div>
     </footer>
   </div>

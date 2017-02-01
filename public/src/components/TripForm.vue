@@ -46,6 +46,7 @@
             Fields marked with a <strong>*</strong> are optional and don't have to be filled in.
           </p>
           <p class="control is-pulled-right">
+            <input type="button" class="button is-medium is-danger" value="Remove trip" v-if="editing" @click="onRemove" />
             <input type="submit" class="button is-medium is-primary" value="Modify trip" v-if="editing">
             <input type="submit" class="button is-medium is-primary" value="Create trip" v-else>
           </p>
@@ -117,6 +118,11 @@ export default {
     },
     onSelectDestination (place) {
       this.destination = place
+    },
+    onRemove () {
+      if (confirm('Are you sure you want to delete this?')) {
+        alert('Not yet implemented')
+      }
     }
   }
 }

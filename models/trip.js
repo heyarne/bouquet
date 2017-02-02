@@ -45,7 +45,9 @@ const tripSchema = new mongoose.Schema({
     required: true,
     default: true,
     index: true
-  }
+  },
+  // the last time a user has been notified so we don't spam them
+  lastNotification: { type: Date }
 })
 
 // add createdAt and updatedAt fields

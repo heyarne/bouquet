@@ -17,11 +17,24 @@ const mongoose = require('mongoose')
 const moment = require('moment')
 const Throttle = require('promise-parallel-throttle')
 
+const { Trip } = require('./models/trip')
+const { User } = require('./models/user')
+const { SearchResult } = require('./models/search-result')
+
+// configure mongoose
 mongoose.Promise = global.Promise
 mongoose.connect(MONGODB_URI, _ => console.log(`Mongoose connected to ${MONGODB_URI}`))
 
-const { Trip } = require('./models/trip')
-const { SearchResult } = require('./models/search-result')
+// configure mail
+const mailer = require('nodemailer').createTransport({
+  sendmail: true,
+  newline: 'unix',
+  path: process.env.SENDMAIL_PATH || '/usr/sbin/sendmail'
+})
+
+//
+// search and notification logic
+//
 
 function toSkyScannerDate (date) {
   const month = ('0' + (date.getMonth() + 1)).substr(-2)
@@ -214,19 +227,71 @@ function findCurrentResults () {
 }
 
 /**
- * [sendBudgetAlarms description]
- * @param  {[type]} resultIds [description]
+ * Sends an e-mail
+ * @param  {String} to       Receiver
+ * @param  {String} subject  Subject line
+ * @param  {String} text     E-Mail content
+ * @return {Promise}         Promise representing the status of the sent e-mail
+ */
+function sendMail ({ to, subject, text }) {
+  return new Promise((resolve, reject) => {
+    const mailConfig = {
+      from: process.env.MAIL_SENDER,
+      subject,
+      text,
+      to
+    }
+    mailer.sendMail(mailConfig, (err, result) => err ? reject(err) : resolve(result))
+  })
+}
+
+/**
+ * Returns the text to be used as the body as a notification mail
+ * @param  {User} user
+ * @param  {SearchResult} result
+ * @return {String}
+ */
+function notificationText ({ user, result }) {
+  return `Hi ${user.email}!
+
+Remember your trip to ${result.trip.destination.properties.label}?
+We found an offer that suits your expectations!
+
+To view the offer directly, go to the following link:
+${result.url}
+
+If you'd like to take a look at your trip, you can use this link:
+${process.env.BASE_URL}/app/#/trip/${result.trip._id}/status
+
+Have fun and stay safe!
+
+Regards,
+Arne from bouquet`
+}
+
+/**
+ * Goes through all search results of this run and sends out the notifications
+ * to the users who created the trips, if appropriate
+ * @param  {ObjectId[]} resultIds An array of search result ids
  * @return {Promise}
  */
-function sendBudgetAlarms (resultIds) {
+function sendNotifications (resultIds) {
+  debug('Sending notifications...')
+  const lastWeek = moment().subtract(7, 'days')
   return SearchResult.find({ _id: { $in: resultIds } })
     .populate('trip')
     .then(results => Promise.all(
-      results.filter(r => r.price <= r.trip.budget)
-        .map(r => {
-          debug(`Should send notifications for result ${r._id}`)
-          return Promise.resolve()
-        })
+      results
+        .filter(r => r.price <= r.trip.budget)
+        .filter(r => r.trip.lastNotification == null || r.trip.lastNotification <= lastWeek)
+        .map(result => User.findOne(result.trip.user).exec() // mongoose `populate` method goes only one level deep
+          .then(user => sendMail({
+            to: user.email,
+            subject: `Remember your trip to ${result.trip.destination.properties.label}?`,
+            text: notificationText({ user, result })
+          }))
+          .then(mail => Trip.update({ _id: result.trip._id }, { lastNotification: new Date() }).exec())
+        )
     ))
 }
 
@@ -245,11 +310,11 @@ if (!module.parent) {
     })
     // print out for stats
     .then(writeResult => {
-      debug(`All done!`)
       debug(`Saved ${writeResult.insertedCount} new results`)
       return writeResult.insertedIds
     })
-    .then(sendBudgetAlarms)
+    .then(sendNotifications)
+    .then(alarmResult => debug(`Sent ${alarmResult.length} notifications`))
     .then(_ => process.exit(0))
     .catch(err => {
       console.error(err)

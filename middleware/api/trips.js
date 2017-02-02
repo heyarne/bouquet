@@ -73,6 +73,7 @@ router.put('/:id', requireLogin(), checkTripPermissions(), (req, res) => {
 })
 
 router.delete('/:id', requireLogin(), checkTripPermissions(), (req, res) => {
+  // TODO: Remove from req.user.trips
   Trip.remove({ _id: req.params.id })
     .then(res.status(200).end())
     .catch(err => res.status(500).json({ message: err.message }))

@@ -37,9 +37,14 @@ export default {
   },
   methods: {
     saveNotes () {
-      const { notes } = this
+      const payload = {}
+      for (let k of Object.keys(this.trip)) {
+        payload[k] = this.trip[k]
+      }
+      payload.notes = this.notes
+
       this.loading = true
-      this.$http.put(`trips/${this.$route.params.tripId}/notes`, { notes })
+      this.$http.put(`trips/${this.$route.params.tripId}`, payload)
         .then(_ => {
           eventBus.$emit('notification', {
             message: 'Note saved'

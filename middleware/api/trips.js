@@ -3,13 +3,11 @@ const { requireLogin, checkTripPermissions } = require('../session-utils')
 const { Trip } = require('../../models/trip')
 const { SearchResult } = require('../../models/search-result')
 
-// TODO: Nicer error handling
-
 router.post('/', requireLogin(), (req, res) => {
   const user = req.user._id
-  const { departure, destination, startDate, endDate } = req.body
+  const { departure, destination, startDate, endDate, notes } = req.body
 
-  new Trip({ user, departure, destination, startDate, endDate })
+  new Trip({ user, departure, destination, startDate, endDate, notes })
     .save()
     .then(trip => {
       // update the user and re-return the trip
@@ -55,11 +53,11 @@ router.get('/:id', requireLogin(), checkTripPermissions(), (req, res) => {
 })
 
 router.put('/:id', requireLogin(), checkTripPermissions(), (req, res) => {
-  const { startDate, endDate, budget } = req.body
+  const { startDate, endDate, budget, notes } = req.body
   const payload = { startDate }
-
   if (endDate) payload.endDate = endDate
   if (budget) payload.budget = budget
+  if (notes) payload.notes = notes
 
   Trip.findOneAndUpdate({ _id: req.params.id }, payload)
     .then(trip => res.status(200).json(trip))
@@ -74,19 +72,10 @@ router.put('/:id', requireLogin(), checkTripPermissions(), (req, res) => {
     })
 })
 
-router.put('/:id/notes', requireLogin(), checkTripPermissions(), (req, res) => {
-  const { notes } = req.body
-  Trip.findOneAndUpdate({ _id: req.params.id }, { notes })
-    .then(trip => res.status(200).json(trip))
-    .catch(err => {
-      if (err.name === 'ValidationError') {
-        const errors = Object.keys(err.errors)
-          .map(k => err.errors[k])
-        res.status(422).json(errors)
-      } else {
-        res.status(500).json({ message: err.message })
-      }
-    })
+router.delete('/:id', requireLogin(), checkTripPermissions(), (req, res) => {
+  Trip.remove({ _id: req.params.id })
+    .then(res.status(200).end())
+    .catch(err => res.status(500).json({ message: err.message }))
 })
 
 module.exports = router

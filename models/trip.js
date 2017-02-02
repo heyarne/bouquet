@@ -1,5 +1,13 @@
 const mongoose = require('mongoose')
 const timestamps = require('mongoose-timestamp')
+const geojsonhint = require('@mapbox/geojsonhint')
+
+const validPlace = {
+  validator (v) {
+    return v.geometry && !geojsonhint.hint(v).length
+  },
+  message: '{VALUE} is not a valid place'
+}
 
 const tripSchema = new mongoose.Schema({
   user: {
@@ -10,12 +18,14 @@ const tripSchema = new mongoose.Schema({
   // Airport for departure
   departure: {
     type: Object,
-    required: [true, 'Please let us know where you want to depart from']
-  }, // actually type: feature
+    required: [true, 'Please let us know where you want to depart from'],
+    validate: validPlace
+  },
   // Airport for destination
   destination: {
     type: Object,
-    required: [true, 'Please tell us where you want to go to']
+    required: [true, 'Please tell us where you want to go to'],
+    validate: validPlace
   }, // see above
   // Start of search
   startDate: {
@@ -25,8 +35,6 @@ const tripSchema = new mongoose.Schema({
   },
   // End of search
   endDate: { type: Date, index: true },
-  // Duration of trip
-  duration: { type: Object },
   // Price for alerts
   budget: { type: Number },
   // Personal notes

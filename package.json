@@ -13,6 +13,7 @@
   "author": "Arne Schlüter",
   "license": "ISC",
   "dependencies": {
+    "@mapbox/geojsonhint": "^1.2.1",
     "body-parser": "^1.15.2",
     "connect-mongo": "^1.3.2",
     "debug": "^2.3.2",

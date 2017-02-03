@@ -41,16 +41,4 @@ export default {
   z-index: -1;
   pointer-events: none;
 }
-
-/*.leaflet-map:before {
-  position: absolute;
-  z-index: 999;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  display: block;
-  background: linear-gradient(to bottom, hsla(0,0%,100%,0) 30%, hsla(0,0%,100%,.5));
-  content: ''
-}*/
 </style>

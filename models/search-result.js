@@ -16,8 +16,10 @@ const searchResultSchema = new mongoose.Schema({
   url: { type: String },
   // how much does it cost?
   price: { type: Number, required: true },
+  // what currency is the price in?
   currency: { type: String, required: true },
-  quoteDate: Date
+  // is it a cached result? if yes, from when is the hit?
+  quoteDate: { type: Date }
 })
 
 const SearchResult = mongoose.model('SearchResult', searchResultSchema)

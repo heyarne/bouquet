@@ -78,6 +78,7 @@ export default {
       editing: !!this.trip,
       startDate: this.trip ? moment(this.trip.startDate).format('YYYY-MM-DD') : null,
       endDate: this.trip && this.trip.endDate ? moment(this.trip.endDate).format('YYYY-MM-DD') : null,
+      budget: this.trip ? this.trip.budget : null,
       config: {
         datePicker: {
           minDate: 'today',
@@ -93,6 +94,7 @@ export default {
         destination: this.trip ? this.trip.destination : this.destination,
         startDate: new Date(this.startDate).toJSON(),
         endDate: this.endDate ? new Date(this.endDate).toJSON() : null,
+        notes: this.trip ? this.trip.notes : null,
         budget: this.budget
       }
 

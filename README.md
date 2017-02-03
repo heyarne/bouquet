@@ -2,9 +2,29 @@
 
 Something nice, but dinner isn't served yet 🍳
 
-## Development
+## Installation
 
-Dependencies:
+In order to install, after cloning this source, make sure you have all [dependencies](#dependencies) installed and setup. Then follow these steps in order:
+
+```
+$ cd $THIS_PROJECT
+$ # install all server-side dependencies
+$ npm install
+$ # after finishing the server-side dependencies, take care of the client
+$ cd public
+$ # install client-side dependencies
+$ npm install
+$ # build client-side assets
+$ npm run build
+$ # after it's done, back to the server
+$ cd ..
+$ # start the server and that's it
+$ node index.js
+```
+
+The `worker.js` needs to be triggered regularly (e.g. daily) in order to provide its functionality.
+
+## Dependencies:
 ```
 $ # Dependencies are managed using homebrew on macOS
 $ brew info node
@@ -15,6 +35,8 @@ $ brew info redis
 redis: stable 3.2.5 (bottled), HEAD
 $ # Don't forget to npm install
 ```
+
+## Development
 
 There are some npm scripts to help you:
 ```
